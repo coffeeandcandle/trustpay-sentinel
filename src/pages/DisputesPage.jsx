@@ -12,10 +12,11 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
 const statusStyles = {
-  open: { label: "Open", color: "bg-amber-500/10 text-amber-600 border-amber-500/20" },
-  under_review: { label: "Under Review", color: "bg-primary/10 text-primary border-primary/20" },
-  resolved: { label: "Resolved", color: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
-  rejected: { label: "Rejected", color: "bg-red-500/10 text-red-500 border-red-500/20" },
+  open:             { label: "Open",             color: "bg-amber-500/10 text-amber-600 border-amber-500/20" },
+  under_review:     { label: "Under Review",     color: "bg-primary/10 text-primary border-primary/20" },
+  resolved_release: { label: "Released",         color: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
+  resolved_refund:  { label: "Refunded",         color: "bg-teal-500/10 text-teal-600 border-teal-500/20" },
+  rejected:         { label: "Rejected",         color: "bg-red-500/10 text-red-500 border-red-500/20" },
 };
 
 const priorityStyles = {
@@ -70,7 +71,8 @@ export default function DisputesPage() {
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="open">Open</SelectItem>
               <SelectItem value="under_review">Under Review</SelectItem>
-              <SelectItem value="resolved">Resolved</SelectItem>
+              <SelectItem value="resolved_release">Released</SelectItem>
+              <SelectItem value="resolved_refund">Refunded</SelectItem>
               <SelectItem value="rejected">Rejected</SelectItem>
             </SelectContent>
           </Select>
@@ -123,7 +125,7 @@ export default function DisputesPage() {
                   </td>
                   <td className="px-6 py-4 text-sm font-mono text-foreground">{d.transaction_id}</td>
                   <td className="px-6 py-4 text-sm text-muted-foreground">{d.user_email}</td>
-                  <td className="px-6 py-4 text-sm font-semibold text-foreground">${d.amount?.toLocaleString()}</td>
+                  <td className="px-6 py-4 text-sm font-semibold text-foreground">AED {d.amount?.toLocaleString()}</td>
                   <td className="px-6 py-4"><Badge variant="secondary" className="capitalize text-xs">{d.reason?.replace(/_/g, " ")}</Badge></td>
                   <td className="px-6 py-4"><span className={cn("text-xs font-medium px-2 py-0.5 rounded-full capitalize", priorityStyles[d.priority])}>{d.priority}</span></td>
                   <td className="px-6 py-4"><span className={cn("text-xs font-medium px-2.5 py-1 rounded-full border", status.color)}>{status.label}</span></td>
@@ -155,7 +157,7 @@ export default function DisputesPage() {
               )}
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div><span className="text-muted-foreground">Transaction</span><p className="font-mono font-medium mt-0.5">{selected.transaction_id}</p></div>
-                <div><span className="text-muted-foreground">Amount</span><p className="font-semibold mt-0.5">${selected.amount?.toLocaleString()}</p></div>
+                <div><span className="text-muted-foreground">Amount</span><p className="font-semibold mt-0.5">AED {selected.amount?.toLocaleString()}</p></div>
                 <div><span className="text-muted-foreground">User</span><p className="mt-0.5">{selected.user_email}</p></div>
                 <div><span className="text-muted-foreground">Reason</span><p className="capitalize mt-0.5">{selected.reason?.replace(/_/g, " ")}</p></div>
               </div>
@@ -167,13 +169,16 @@ export default function DisputesPage() {
               )}
               {(selected.status === "open" || selected.status === "under_review") && (
                 <div className="border-t border-border pt-4 space-y-3">
-                  <Textarea placeholder="Resolution notes..." value={resolution} onChange={e => setResolution(e.target.value)} />
-                  <div className="flex gap-2">
+                  <Textarea placeholder="Resolution notes (required for audit trail)..." value={resolution} onChange={e => setResolution(e.target.value)} />
+                  <div className="flex gap-2 flex-wrap">
                     <Button size="sm" onClick={() => updateMutation.mutate({ id: selected.id, data: { status: "under_review" } })} variant="outline" className="gap-1.5">
-                      <Clock className="w-3.5 h-3.5" /> Review
+                      <Clock className="w-3.5 h-3.5" /> Under Review
                     </Button>
-                    <Button size="sm" onClick={() => updateMutation.mutate({ id: selected.id, data: { status: "resolved", resolution_notes: resolution } })} className="gap-1.5 bg-emerald-600 hover:bg-emerald-700">
-                      <CheckCircle2 className="w-3.5 h-3.5" /> Resolve
+                    <Button size="sm" onClick={() => updateMutation.mutate({ id: selected.id, data: { status: "resolved_release", resolution_notes: resolution } })} className="gap-1.5 bg-emerald-600 hover:bg-emerald-700">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Release to Recipient
+                    </Button>
+                    <Button size="sm" onClick={() => updateMutation.mutate({ id: selected.id, data: { status: "resolved_refund", resolution_notes: resolution } })} className="gap-1.5 bg-teal-600 hover:bg-teal-700">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Refund to Sender
                     </Button>
                     <Button size="sm" onClick={() => updateMutation.mutate({ id: selected.id, data: { status: "rejected", resolution_notes: resolution } })} variant="destructive" className="gap-1.5">
                       <XCircle className="w-3.5 h-3.5" /> Reject

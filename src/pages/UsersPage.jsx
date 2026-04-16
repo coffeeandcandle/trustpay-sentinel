@@ -4,12 +4,33 @@ import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Users, Mail, Calendar } from "lucide-react";
+import { Search, Users, Mail, Calendar, ShieldCheck, ShieldAlert, Shield } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+const verificationStyles = {
+  unverified:          { label: "Unverified",        cls: "bg-muted text-muted-foreground" },
+  pending_verification:{ label: "Pending KYC",       cls: "bg-amber-500/10 text-amber-600" },
+  uae_verified:        { label: "UAE Verified",      cls: "bg-emerald-500/10 text-emerald-600" },
+};
+
+const accountStatusStyles = {
+  active:          { label: "Active",          cls: "bg-emerald-500/10 text-emerald-600" },
+  suspended:       { label: "Suspended",       cls: "bg-amber-500/10 text-amber-600" },
+  banned:          { label: "Banned",          cls: "bg-red-500/10 text-red-500" },
+  pending_deletion:{ label: "Pending Deletion",cls: "bg-muted text-muted-foreground" },
+};
+
+const planStyles = {
+  free:     "bg-muted text-muted-foreground",
+  pro:      "bg-primary/10 text-primary",
+  business: "bg-purple-500/10 text-purple-600",
+};
 import { format } from "date-fns";
 
 export default function UsersPage() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const { data: users, isLoading } = useQuery({
     queryKey: ["users"],
@@ -23,9 +44,11 @@ export default function UsersPage() {
   const filtered = users.filter(u => {
     const matchSearch = !search || 
       u.full_name?.toLowerCase().includes(search.toLowerCase()) || 
-      u.email?.toLowerCase().includes(search.toLowerCase());
+      u.email?.toLowerCase().includes(search.toLowerCase()) ||
+      u.phone?.toLowerCase().includes(search.toLowerCase());
     const matchRole = roleFilter === "all" || u.role === roleFilter;
-    return matchSearch && matchRole;
+    const matchStatus = statusFilter === "all" || u.account_status === statusFilter;
+    return matchSearch && matchRole && matchStatus;
   });
 
   return (
@@ -36,8 +59,18 @@ export default function UsersPage() {
           <p className="text-sm text-muted-foreground mt-1">{users.length} registered users</p>
         </div>
         <div className="flex items-center gap-3">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[160px]"><SelectValue placeholder="All Statuses" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="suspended">Suspended</SelectItem>
+              <SelectItem value="banned">Banned</SelectItem>
+              <SelectItem value="pending_deletion">Pending Deletion</SelectItem>
+            </SelectContent>
+          </Select>
           <Select value={roleFilter} onValueChange={setRoleFilter}>
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-[130px]">
               <SelectValue placeholder="All Roles" />
             </SelectTrigger>
             <SelectContent>
@@ -64,7 +97,9 @@ export default function UsersPage() {
             <tr className="border-b border-border">
               <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-6 py-4">User</th>
               <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-6 py-4">Email</th>
-              <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-6 py-4">Role</th>
+              <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-6 py-4">KYC Status</th>
+              <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-6 py-4">Account</th>
+              <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-6 py-4">Plan</th>
               <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-6 py-4">Joined</th>
             </tr>
           </thead>
@@ -80,7 +115,7 @@ export default function UsersPage() {
               ))
             ) : filtered.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-6 py-12 text-center">
+                <td colSpan={7} className="px-6 py-12 text-center">
                   <Users className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
                   <p className="text-sm text-muted-foreground">No users found</p>
                 </td>
@@ -104,15 +139,27 @@ export default function UsersPage() {
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <Badge variant={user.role === "admin" ? "default" : "secondary"} className="capitalize text-xs">
-                    {user.role || "user"}
-                  </Badge>
+                 {(() => {
+                   const v = verificationStyles[user.verification_level] || verificationStyles.unverified;
+                   return <span className={cn("text-xs font-medium px-2 py-0.5 rounded-full", v.cls)}>{v.label}</span>;
+                 })()}
                 </td>
                 <td className="px-6 py-4">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Calendar className="w-3.5 h-3.5" />
-                    {user.created_date ? format(new Date(user.created_date), "MMM d, yyyy") : "—"}
-                  </div>
+                 {(() => {
+                   const s = accountStatusStyles[user.account_status] || accountStatusStyles.active;
+                   return <span className={cn("text-xs font-medium px-2 py-0.5 rounded-full", s.cls)}>{s.label}</span>;
+                 })()}
+                </td>
+                <td className="px-6 py-4">
+                 <span className={cn("text-xs font-medium px-2 py-0.5 rounded-full capitalize", planStyles[user.subscription_plan] || planStyles.free)}>
+                   {user.subscription_plan || "free"}
+                 </span>
+                </td>
+                <td className="px-6 py-4">
+                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                   <Calendar className="w-3.5 h-3.5" />
+                   {user.created_date ? format(new Date(user.created_date), "MMM d, yyyy") : "—"}
+                 </div>
                 </td>
               </tr>
             ))}

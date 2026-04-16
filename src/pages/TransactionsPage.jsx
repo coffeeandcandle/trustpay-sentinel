@@ -10,19 +10,18 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
 const statusStyles = {
-  pending:    { label: "Pending",    cls: "bg-amber-500/10 text-amber-600 border-amber-500/20" },
-  processing: { label: "Processing", cls: "bg-primary/10 text-primary border-primary/20" },
-  completed:  { label: "Completed",  cls: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
-  failed:     { label: "Failed",     cls: "bg-red-500/10 text-red-500 border-red-500/20" },
-  flagged:    { label: "Flagged",    cls: "bg-orange-500/10 text-orange-600 border-orange-500/20" },
+  pending:    { label: "Pending",     cls: "bg-amber-500/10 text-amber-600 border-amber-500/20" },
+  sender_ok:  { label: "Sender OK",  cls: "bg-primary/10 text-primary border-primary/20" },
+  released:   { label: "Released",   cls: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
+  cancelled:  { label: "Cancelled",  cls: "bg-red-500/10 text-red-500 border-red-500/20" },
+  disputed:   { label: "Disputed",   cls: "bg-orange-500/10 text-orange-600 border-orange-500/20" },
 };
 
 const typeIcons = {
-  transfer:   ArrowUpRight,
-  payment:    ArrowUpRight,
-  deposit:    ArrowDownLeft,
-  withdrawal: ArrowUpRight,
+  escrow:     ArrowUpRight,
+  withdrawal: ArrowDownLeft,
   refund:     RefreshCw,
+  fee:        ArrowUpRight,
 };
 
 export default function TransactionsPage() {
@@ -62,8 +61,8 @@ export default function TransactionsPage() {
   });
 
   const totalVolume   = filtered.reduce((s, t) => s + (t.amount || 0), 0);
-  const flaggedCount  = filtered.filter(t => t.flagged || t.status === "flagged").length;
-  const pendingCount  = filtered.filter(t => t.status === "pending" || t.status === "processing").length;
+  const flaggedCount  = filtered.filter(t => t.flagged || t.status === "disputed").length;
+  const pendingCount  = filtered.filter(t => t.status === "pending" || t.status === "sender_ok").length;
 
   return (
     <div className="p-8">
@@ -85,13 +84,13 @@ export default function TransactionsPage() {
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-card rounded-2xl border border-border/50 p-4">
           <p className="text-xs text-muted-foreground font-medium">Total Volume</p>
-          <p className="text-2xl font-bold text-foreground mt-1">${totalVolume.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+          <p className="text-2xl font-bold text-foreground mt-1">AED {totalVolume.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
           <p className="text-xs text-muted-foreground mt-1">{filtered.length} transactions</p>
         </div>
         <div className="bg-card rounded-2xl border border-border/50 p-4">
           <p className="text-xs text-muted-foreground font-medium">In Progress</p>
           <p className="text-2xl font-bold text-primary mt-1">{pendingCount}</p>
-          <p className="text-xs text-muted-foreground mt-1">Pending / Processing</p>
+          <p className="text-xs text-muted-foreground mt-1">Pending / Sender OK</p>
         </div>
         <div className="bg-card rounded-2xl border border-border/50 p-4">
           <p className="text-xs text-muted-foreground font-medium">Flagged</p>
@@ -111,21 +110,20 @@ export default function TransactionsPage() {
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="processing">Processing</SelectItem>
-            <SelectItem value="completed">Completed</SelectItem>
-            <SelectItem value="failed">Failed</SelectItem>
-            <SelectItem value="flagged">Flagged</SelectItem>
+            <SelectItem value="sender_ok">Sender OK</SelectItem>
+            <SelectItem value="released">Released</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+            <SelectItem value="disputed">Disputed</SelectItem>
           </SelectContent>
         </Select>
         <Select value={typeFilter} onValueChange={setType}>
           <SelectTrigger className="w-[140px]"><SelectValue placeholder="All Types" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Types</SelectItem>
-            <SelectItem value="transfer">Transfer</SelectItem>
-            <SelectItem value="payment">Payment</SelectItem>
-            <SelectItem value="deposit">Deposit</SelectItem>
+            <SelectItem value="escrow">Escrow</SelectItem>
             <SelectItem value="withdrawal">Withdrawal</SelectItem>
             <SelectItem value="refund">Refund</SelectItem>
+            <SelectItem value="fee">Fee</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -170,15 +168,15 @@ export default function TransactionsPage() {
                       transition={{ duration: 3 }}
                       className={cn(
                         "border-b border-border/50 hover:bg-muted/30 transition-colors",
-                        (tx.flagged || tx.status === "flagged") && "bg-orange-500/5"
+                        (tx.flagged || tx.status === "disputed") && "bg-orange-500/5"
                       )}
                     >
                       <td className="px-5 py-3.5 text-sm font-mono text-foreground">{tx.transaction_id || tx.id?.slice(0, 12)}</td>
                       <td className="px-5 py-3.5 text-sm text-muted-foreground">{tx.sender_name || tx.sender_email || "—"}</td>
                       <td className="px-5 py-3.5 text-sm text-muted-foreground">{tx.recipient_name || tx.recipient_email || "—"}</td>
                       <td className="px-5 py-3.5">
-                        <span className="text-sm font-semibold text-foreground">${tx.amount?.toLocaleString()}</span>
-                        {tx.fee > 0 && <span className="text-xs text-muted-foreground ml-1">+${tx.fee} fee</span>}
+                       <span className="text-sm font-semibold text-foreground">AED {tx.amount?.toLocaleString()}</span>
+                       {tx.fee > 0 && <span className="text-xs text-muted-foreground ml-1">+AED {tx.fee} fee</span>}
                       </td>
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-1.5 text-sm text-muted-foreground capitalize">
@@ -192,7 +190,7 @@ export default function TransactionsPage() {
                         {tx.created_date ? format(new Date(tx.created_date), "MMM d, HH:mm:ss") : "—"}
                       </td>
                       <td className="px-5 py-3.5">
-                        {(tx.flagged || tx.status === "flagged") && (
+                        {(tx.flagged || tx.status === "disputed") && (
                           <AlertOctagon className="w-4 h-4 text-orange-500" />
                         )}
                         {isNew && (

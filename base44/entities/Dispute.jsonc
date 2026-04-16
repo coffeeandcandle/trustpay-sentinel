@@ -15,16 +15,15 @@
       "description": "Email of the user who raised the dispute"
     },
     "user_name": {
-      "type": "string",
-      "description": "Name of the user"
+      "type": "string"
     },
     "amount": {
       "type": "number",
-      "description": "Disputed amount"
+      "description": "Disputed amount in AED"
     },
     "currency": {
       "type": "string",
-      "default": "USD"
+      "default": "AED"
     },
     "reason": {
       "type": "string",
@@ -34,19 +33,18 @@
         "not_received",
         "defective",
         "other"
-      ],
-      "description": "Reason for the dispute"
+      ]
     },
     "description": {
-      "type": "string",
-      "description": "Detailed description of the dispute"
+      "type": "string"
     },
     "status": {
       "type": "string",
       "enum": [
         "open",
         "under_review",
-        "resolved",
+        "resolved_release",
+        "resolved_refund",
         "rejected"
       ],
       "default": "open"
@@ -63,6 +61,10 @@
     },
     "resolution_notes": {
       "type": "string"
+    },
+    "assigned_to": {
+      "type": "string",
+      "description": "Admin staff email handling this dispute"
     }
   },
   "required": [

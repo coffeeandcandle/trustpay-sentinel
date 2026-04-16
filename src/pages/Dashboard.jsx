@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { useQuery } from "@tanstack/react-query";
-import { Users, DollarSign, AlertTriangle, TrendingUp } from "lucide-react";
+
+import { Users, AlertTriangle, TrendingUp, ArrowLeftRight, Wallet } from "lucide-react";
 import StatCard from "../components/dashboard/StatCard";
 import RevenueChart from "../components/dashboard/RevenueChart";
 import RecentActivity from "../components/dashboard/RecentActivity";
@@ -28,7 +29,15 @@ export default function Dashboard() {
     initialData: [],
   });
 
+  const { data: transactions } = useQuery({
+    queryKey: ["transactions-count"],
+    queryFn: () => base44.entities.Transaction.list("-created_date", 500),
+    initialData: [],
+  });
+
   const openDisputes = disputes.filter(d => d.status === "open" || d.status === "under_review").length;
+  const pendingTx = transactions.filter(t => t.status === "pending" || t.status === "sender_ok").length;
+  const totalVolume = transactions.reduce((s, t) => s + (t.amount || 0), 0);
 
   return (
     <div className="p-8">
@@ -43,9 +52,9 @@ export default function Dashboard() {
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
         <StatCard title="Total Users" value={users.length.toLocaleString()} change="12.5%" changeType="up" icon={Users} />
-        <StatCard title="Revenue (MTD)" value="$98,420" change="8.2%" changeType="up" icon={DollarSign} />
+        <StatCard title="Total Volume" value={`AED ${(totalVolume / 1000).toFixed(0)}k`} change="8.2%" changeType="up" icon={Wallet} />
         <StatCard title="Open Disputes" value={openDisputes} change="3.1%" changeType="down" icon={AlertTriangle} iconBg="bg-amber-500/10" />
-        <StatCard title="Transaction Vol." value="2,847" change="15.3%" changeType="up" icon={TrendingUp} />
+        <StatCard title="Pending Escrows" value={pendingTx} change="5.4%" changeType="up" icon={ArrowLeftRight} />
       </div>
 
       {/* Charts & Activity */}

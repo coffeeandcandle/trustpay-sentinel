@@ -4,7 +4,7 @@
   "properties": {
     "transaction_id": {
       "type": "string",
-      "description": "Unique transaction reference"
+      "description": "Unique transaction reference e.g. TXN-00123"
     },
     "sender_email": {
       "type": "string"
@@ -19,31 +19,31 @@
       "type": "string"
     },
     "amount": {
-      "type": "number"
+      "type": "number",
+      "description": "Amount in AED"
     },
     "currency": {
       "type": "string",
-      "default": "USD"
+      "default": "AED"
     },
     "type": {
       "type": "string",
       "enum": [
-        "transfer",
-        "payment",
-        "deposit",
+        "escrow",
         "withdrawal",
-        "refund"
+        "refund",
+        "fee"
       ],
-      "default": "transfer"
+      "default": "escrow"
     },
     "status": {
       "type": "string",
       "enum": [
         "pending",
-        "processing",
-        "completed",
-        "failed",
-        "flagged"
+        "sender_ok",
+        "released",
+        "cancelled",
+        "disputed"
       ],
       "default": "pending"
     },
@@ -60,6 +60,13 @@
     "fee": {
       "type": "number",
       "default": 0
+    },
+    "internal_notes": {
+      "type": "string"
+    },
+    "uaefts_reference": {
+      "type": "string",
+      "description": "UAEFTS transfer reference number"
     }
   },
   "required": [

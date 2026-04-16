@@ -4,8 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Users, Mail, Calendar, ShieldCheck, ShieldAlert, Shield } from "lucide-react";
+import { Search, Users, Mail, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
+import UserActionDialog from "@/components/users/UserActionDialog";
+import { Button } from "@/components/ui/button";
 
 const verificationStyles = {
   unverified:          { label: "Unverified",        cls: "bg-muted text-muted-foreground" },
@@ -31,6 +33,7 @@ export default function UsersPage() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const { data: users, isLoading } = useQuery({
     queryKey: ["users"],
@@ -101,6 +104,7 @@ export default function UsersPage() {
               <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-6 py-4">Account</th>
               <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-6 py-4">Plan</th>
               <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-6 py-4">Joined</th>
+              <th className="px-6 py-4"></th>
             </tr>
           </thead>
           <tbody>
@@ -161,11 +165,21 @@ export default function UsersPage() {
                    {user.created_date ? format(new Date(user.created_date), "MMM d, yyyy") : "—"}
                  </div>
                 </td>
-              </tr>
+                <td className="px-6 py-4 text-right">
+                  <Button variant="ghost" size="sm" className="text-xs" onClick={() => setSelectedUser(user)}>
+                    Manage
+                  </Button>
+                </td>
+                </tr>
             ))}
           </tbody>
         </table>
       </div>
+      <UserActionDialog
+        user={selectedUser}
+        open={!!selectedUser}
+        onClose={() => setSelectedUser(null)}
+      />
     </div>
   );
 }

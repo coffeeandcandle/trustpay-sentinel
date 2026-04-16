@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, Users, BarChart3, FileText, AlertTriangle, 
-  Bell, MessageCircle, ChevronLeft, ChevronRight, Shield, LogOut, Zap
+  Bell, MessageCircle, ChevronLeft, ChevronRight, Shield, LogOut, Zap, Ticket
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,7 @@ const navItems = [
   { path: "/analytics", label: "Analytics", icon: BarChart3 },
   { path: "/reports", label: "Reports", icon: FileText },
   { path: "/disputes", label: "Disputes", icon: AlertTriangle },
+  { path: "/tickets", label: "Complaints", icon: Ticket },
   { path: "/notifications", label: "Notifications", icon: Bell },
   { path: "/chat", label: "Live Chat", icon: MessageCircle },
 ];

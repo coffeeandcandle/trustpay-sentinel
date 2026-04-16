@@ -16,6 +16,7 @@ import NotificationsPage from './pages/NotificationsPage';
 import ChatPage from './pages/ChatPage';
 import TransactionsPage from './pages/TransactionsPage';
 import AccessDeniedPage from './pages/AccessDeniedPage';
+import TicketsPage from './pages/TicketsPage';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, user } = useAuth();
@@ -56,6 +57,7 @@ const AuthenticatedApp = () => {
         <Route path="/disputes" element={<DisputesPage />} />
         <Route path="/notifications" element={<NotificationsPage />} />
         <Route path="/chat" element={<ChatPage />} />
+        <Route path="/tickets" element={<TicketsPage />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

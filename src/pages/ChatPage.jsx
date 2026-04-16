@@ -102,7 +102,7 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex" style={{ height: "calc(100vh - 72px)" }}>
+    <div className="flex" style={{ height: "calc(100vh - 64px)" }}>
       {/* Conversations List */}
       <div className="w-[400px] min-w-[400px] border-r border-border bg-card flex flex-col overflow-hidden">
         <div className="p-5 border-b border-border">

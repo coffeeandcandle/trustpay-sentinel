@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings, UserPlus, Trash2, Shield, Mail, Crown, DollarSign, Save } from "lucide-react";
+import { Settings, UserPlus, Trash2, Shield, Mail, Crown, DollarSign, Save, Lock, Eye, EyeOff } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
@@ -31,8 +31,35 @@ export default function SettingsPage() {
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("admin");
   const [currency, setCurrency] = useState(() => localStorage.getItem("platform_currency") || "AED");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPw, setShowNewPw] = useState(false);
+  const [showConfirmPw, setShowConfirmPw] = useState(false);
+  const [pwLoading, setPwLoading] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  const handleChangePassword = async () => {
+    if (newPassword.length < 6) {
+      toast({ title: "Error", description: "Password must be at least 6 characters.", variant: "destructive" });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast({ title: "Error", description: "Passwords do not match.", variant: "destructive" });
+      return;
+    }
+    setPwLoading(true);
+    try {
+      await base44.auth.updateMe({ password: newPassword });
+      toast({ title: "Password updated", description: "Your password has been changed successfully." });
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setPwLoading(false);
+    }
+  };
 
   const saveCurrency = () => {
     localStorage.setItem("platform_currency", currency);
@@ -202,6 +229,62 @@ export default function SettingsPage() {
           </div>
           <Button onClick={saveCurrency} className="gap-2 shrink-0">
             <Save className="w-4 h-4" /> Save
+          </Button>
+        </div>
+      </div>
+
+      {/* Change Password Section */}
+      <div className="bg-card rounded-2xl border border-border/50 overflow-hidden mt-6">
+        <div className="px-6 py-4 border-b border-border flex items-center gap-2">
+          <Lock className="w-4 h-4 text-primary" />
+          <h2 className="text-sm font-semibold text-foreground">Change Password</h2>
+        </div>
+        <div className="px-6 py-5 space-y-4 max-w-sm">
+          <div>
+            <label className="text-sm font-medium text-foreground mb-1.5 block">New Password</label>
+            <div className="relative">
+              <Input
+                type={showNewPw ? "text" : "password"}
+                placeholder="Enter new password"
+                value={newPassword}
+                onChange={e => setNewPassword(e.target.value)}
+                className="pr-9"
+              />
+              <button
+                type="button"
+                onClick={() => setShowNewPw(v => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                {showNewPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+          <div>
+            <label className="text-sm font-medium text-foreground mb-1.5 block">Confirm Password</label>
+            <div className="relative">
+              <Input
+                type={showConfirmPw ? "text" : "password"}
+                placeholder="Confirm new password"
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
+                className="pr-9"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPw(v => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                {showConfirmPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+          <Button
+            onClick={handleChangePassword}
+            disabled={!newPassword || !confirmPassword || pwLoading}
+            className="gap-2"
+          >
+            <Lock className="w-4 h-4" />
+            {pwLoading ? "Updating..." : "Update Password"}
           </Button>
         </div>
       </div>

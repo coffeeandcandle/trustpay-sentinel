@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings, UserPlus, Trash2, Shield, Mail, Crown, DollarSign, Save, Lock, Eye, EyeOff } from "lucide-react";
+import { Settings, UserPlus, Trash2, Shield, Mail, Crown, DollarSign, Save, Lock, Eye, EyeOff, KeyRound } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
@@ -28,6 +28,10 @@ const CURRENCIES = [
 
 export default function SettingsPage() {
   const [showInvite, setShowInvite] = useState(false);
+  const [editPwUser, setEditPwUser] = useState(null);
+  const [editPw, setEditPw] = useState("");
+  const [showEditPw, setShowEditPw] = useState(false);
+  const [editPwLoading, setEditPwLoading] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("admin");
   const [currency, setCurrency] = useState(() => localStorage.getItem("platform_currency") || "AED");
@@ -103,6 +107,24 @@ export default function SettingsPage() {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     },
   });
+
+  const handleEditAdminPassword = async () => {
+    if (editPw.length < 6) {
+      toast({ title: "Error", description: "Password must be at least 6 characters.", variant: "destructive" });
+      return;
+    }
+    setEditPwLoading(true);
+    try {
+      await base44.functions.invoke("updateAdminPassword", { userId: editPwUser.id, password: editPw });
+      toast({ title: "Password updated", description: `Password for ${editPwUser.full_name || editPwUser.email} has been changed.` });
+      setEditPwUser(null);
+      setEditPw("");
+    } catch (err) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setEditPwLoading(false);
+    }
+  };
 
   const changeRoleMutation = useMutation({
     mutationFn: async ({ userId, role }) => {
@@ -211,15 +233,25 @@ export default function SettingsPage() {
                   {user.created_date ? format(new Date(user.created_date), "MMM d, yyyy") : "—"}
                 </td>
                 <td className="px-6 py-4 text-right">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-red-500 hover:text-red-600 hover:bg-red-500/10 gap-1.5 text-xs"
-                    onClick={() => removeAdminMutation.mutate(user.id)}
-                    disabled={removeAdminMutation.isPending}
-                  >
-                    <Trash2 className="w-3.5 h-3.5" /> Remove Admin
-                  </Button>
+                  <div className="flex items-center justify-end gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+                      onClick={() => { setEditPwUser(user); setEditPw(""); setShowEditPw(false); }}
+                    >
+                      <KeyRound className="w-3.5 h-3.5" /> Password
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-500 hover:text-red-600 hover:bg-red-500/10 gap-1.5 text-xs"
+                      onClick={() => removeAdminMutation.mutate(user.id)}
+                      disabled={removeAdminMutation.isPending}
+                    >
+                      <Trash2 className="w-3.5 h-3.5" /> Remove
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -311,6 +343,51 @@ export default function SettingsPage() {
           </Button>
         </div>
       </div>
+
+      {/* Edit Admin Password Dialog */}
+      <Dialog open={!!editPwUser} onOpenChange={(open) => !open && setEditPwUser(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <KeyRound className="w-5 h-5 text-primary" /> Change Password
+            </DialogTitle>
+          </DialogHeader>
+          {editPwUser && (
+            <div className="space-y-4 mt-2">
+              <p className="text-sm text-muted-foreground">
+                Setting new password for <span className="font-medium text-foreground">{editPwUser.full_name || editPwUser.email}</span>
+              </p>
+              <div>
+                <label className="text-sm font-medium text-foreground mb-1.5 block">New Password</label>
+                <div className="relative">
+                  <Input
+                    type={showEditPw ? "text" : "password"}
+                    placeholder="Enter new password (min. 6 chars)"
+                    value={editPw}
+                    onChange={e => setEditPw(e.target.value)}
+                    className="pr-9"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowEditPw(v => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    {showEditPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+              <Button
+                className="w-full gap-2"
+                disabled={!editPw || editPwLoading}
+                onClick={handleEditAdminPassword}
+              >
+                <Lock className="w-4 h-4" />
+                {editPwLoading ? "Updating..." : "Update Password"}
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Invite Dialog */}
       <Dialog open={showInvite} onOpenChange={setShowInvite}>

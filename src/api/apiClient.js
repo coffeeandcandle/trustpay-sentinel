@@ -1,4 +1,4 @@
-const BASE_URL = 'http://51.21.197.111';
+const BASE_URL = 'https://api.trustdepo.com';
 const TOKEN_KEY = 'trustpay_access_token';
 
 export const getToken = () => {

@@ -2,13 +2,14 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, Users, BarChart3, FileText, AlertTriangle, 
-  Bell, MessageCircle, ChevronLeft, ChevronRight, Shield, LogOut
+  Bell, MessageCircle, ChevronLeft, ChevronRight, Shield, LogOut, Zap
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { path: "/", label: "Dashboard", icon: LayoutDashboard },
+  { path: "/transactions", label: "Transactions", icon: Zap },
   { path: "/users", label: "Users", icon: Users },
   { path: "/analytics", label: "Analytics", icon: BarChart3 },
   { path: "/reports", label: "Reports", icon: FileText },

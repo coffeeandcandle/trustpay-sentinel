@@ -14,16 +14,18 @@ import ReportsPage from './pages/ReportsPage';
 import DisputesPage from './pages/DisputesPage';
 import NotificationsPage from './pages/NotificationsPage';
 import ChatPage from './pages/ChatPage';
+import TransactionsPage from './pages/TransactionsPage';
+import AccessDeniedPage from './pages/AccessDeniedPage';
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, user } = useAuth();
 
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-background">
+      <div className="fixed inset-0 flex items-center justify-center bg-[hsl(222,47%,11%)]">
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-          <p className="text-sm text-muted-foreground">Loading TrustPay...</p>
+          <p className="text-sm text-slate-400">Loading TrustPay...</p>
         </div>
       </div>
     );
@@ -38,10 +40,16 @@ const AuthenticatedApp = () => {
     }
   }
 
+  // Block non-admin users
+  if (user && user.role !== 'admin') {
+    return <AccessDeniedPage />;
+  }
+
   return (
     <Routes>
       <Route element={<DashboardLayout />}>
         <Route path="/" element={<Dashboard />} />
+        <Route path="/transactions" element={<TransactionsPage />} />
         <Route path="/users" element={<UsersPage />} />
         <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/reports" element={<ReportsPage />} />

@@ -1,0 +1,70 @@
+{
+  "name": "Transaction",
+  "type": "object",
+  "properties": {
+    "transaction_id": {
+      "type": "string",
+      "description": "Unique transaction reference"
+    },
+    "sender_email": {
+      "type": "string"
+    },
+    "sender_name": {
+      "type": "string"
+    },
+    "recipient_email": {
+      "type": "string"
+    },
+    "recipient_name": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "currency": {
+      "type": "string",
+      "default": "USD"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "transfer",
+        "payment",
+        "deposit",
+        "withdrawal",
+        "refund"
+      ],
+      "default": "transfer"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "processing",
+        "completed",
+        "failed",
+        "flagged"
+      ],
+      "default": "pending"
+    },
+    "flagged": {
+      "type": "boolean",
+      "default": false
+    },
+    "flag_reason": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "fee": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "amount",
+    "type",
+    "status"
+  ]
+}

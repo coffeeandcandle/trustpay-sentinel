@@ -6,17 +6,38 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings, UserPlus, Trash2, Shield, Mail, Crown } from "lucide-react";
+import { Settings, UserPlus, Trash2, Shield, Mail, Crown, DollarSign, Save } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
+
+const CURRENCIES = [
+  { code: "AED", name: "UAE Dirham" },
+  { code: "USD", name: "US Dollar" },
+  { code: "EUR", name: "Euro" },
+  { code: "GBP", name: "British Pound" },
+  { code: "SAR", name: "Saudi Riyal" },
+  { code: "QAR", name: "Qatari Riyal" },
+  { code: "KWD", name: "Kuwaiti Dinar" },
+  { code: "BHD", name: "Bahraini Dinar" },
+  { code: "OMR", name: "Omani Rial" },
+  { code: "INR", name: "Indian Rupee" },
+  { code: "PKR", name: "Pakistani Rupee" },
+  { code: "EGP", name: "Egyptian Pound" },
+];
 
 export default function SettingsPage() {
   const [showInvite, setShowInvite] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("admin");
+  const [currency, setCurrency] = useState(() => localStorage.getItem("platform_currency") || "AED");
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
+  const saveCurrency = () => {
+    localStorage.setItem("platform_currency", currency);
+    toast({ title: "Currency updated", description: `Platform currency set to ${currency}.` });
+  };
 
   const { data: users, isLoading } = useQuery({
     queryKey: ["all-users"],
@@ -147,6 +168,35 @@ export default function SettingsPage() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Currency Settings Section */}
+      <div className="bg-card rounded-2xl border border-border/50 overflow-hidden mt-6">
+        <div className="px-6 py-4 border-b border-border flex items-center gap-2">
+          <DollarSign className="w-4 h-4 text-primary" />
+          <h2 className="text-sm font-semibold text-foreground">Currency Settings</h2>
+        </div>
+        <div className="px-6 py-5 flex items-end gap-4">
+          <div className="flex-1 max-w-xs">
+            <label className="text-sm font-medium text-foreground mb-1.5 block">Platform Currency</label>
+            <Select value={currency} onValueChange={setCurrency}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CURRENCIES.map(c => (
+                  <SelectItem key={c.code} value={c.code}>
+                    {c.code} — {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground mt-1.5">This sets the default currency displayed across the platform.</p>
+          </div>
+          <Button onClick={saveCurrency} className="gap-2 shrink-0">
+            <Save className="w-4 h-4" /> Save
+          </Button>
+        </div>
       </div>
 
       {/* Invite Dialog */}

@@ -37,7 +37,7 @@ export default function Sidebar() {
         </div>
         {!collapsed && (
           <div className="overflow-hidden">
-            <h1 className="text-lg font-bold text-sidebar-foreground tracking-tight">TrustPay</h1>
+            <h1 className="text-lg font-bold text-sidebar-foreground tracking-tight">Sando Pay</h1>
             <p className="text-[10px] uppercase tracking-widest text-sidebar-foreground/50 font-medium">Admin Panel</p>
           </div>
         )}

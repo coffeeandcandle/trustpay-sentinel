@@ -22,14 +22,14 @@ export default function AdminSignIn() {
             <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-5">
               <Shield className="w-8 h-8 text-primary" />
             </div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">TrustPay</h1>
+            <h1 className="text-2xl font-bold text-white tracking-tight">Sando Pay</h1>
             <p className="text-sm text-slate-400 mt-1">Admin Operations Portal</p>
           </div>
 
           <div className="border-t border-white/10 mb-8" />
 
           <p className="text-slate-300 text-sm text-center mb-8">
-            This portal is restricted to authorized TrustPay administrators only.
+            This portal is restricted to authorized Sando Pay administrators only.
           </p>
 
           <Button
@@ -45,7 +45,7 @@ export default function AdminSignIn() {
         </div>
 
         <p className="text-center text-xs text-slate-600 mt-6">
-          © {new Date().getFullYear()} TrustPay. All rights reserved.
+          © {new Date().getFullYear()} Sando Pay. All rights reserved.
         </p>
       </div>
     </div>

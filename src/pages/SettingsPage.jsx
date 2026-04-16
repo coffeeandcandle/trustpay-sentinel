@@ -104,6 +104,19 @@ export default function SettingsPage() {
     },
   });
 
+  const changeRoleMutation = useMutation({
+    mutationFn: async ({ userId, role }) => {
+      await base44.entities.User.update(userId, { role });
+    },
+    onSuccess: () => {
+      toast({ title: "Role updated", description: "User role has been updated." });
+      queryClient.invalidateQueries({ queryKey: ["all-users"] });
+    },
+    onError: (err) => {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    },
+  });
+
   return (
     <div className="p-8 max-w-4xl">
       <div className="flex items-center justify-between mb-8">
@@ -172,17 +185,27 @@ export default function SettingsPage() {
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  {user.role === "admin" ? (
-                    <div className="flex items-center gap-1.5">
-                      <Crown className="w-3.5 h-3.5 text-amber-500" />
-                      <span className="text-xs font-medium text-amber-600 bg-amber-500/10 px-2 py-0.5 rounded-full">Admin</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-1.5">
-                      <Shield className="w-3.5 h-3.5 text-slate-400" />
-                      <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">View Only</span>
-                    </div>
-                  )}
+                  <Select
+                    value={user.role}
+                    onValueChange={(role) => changeRoleMutation.mutate({ userId: user.id, role })}
+                    disabled={changeRoleMutation.isPending}
+                  >
+                    <SelectTrigger className="w-[130px] h-7 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="admin">
+                        <div className="flex items-center gap-1.5">
+                          <Crown className="w-3 h-3 text-amber-500" /> Admin
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="view_only">
+                        <div className="flex items-center gap-1.5">
+                          <Shield className="w-3 h-3 text-slate-400" /> View Only
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </td>
                 <td className="px-6 py-4 text-sm text-muted-foreground">
                   {user.created_date ? format(new Date(user.created_date), "MMM d, yyyy") : "—"}

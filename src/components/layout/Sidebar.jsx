@@ -32,14 +32,17 @@ export default function Sidebar() {
     )}>
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 h-[72px] border-b border-sidebar-border">
-        <div className="w-9 h-9 rounded-xl bg-sidebar-primary flex items-center justify-center flex-shrink-0">
-          <Shield className="w-5 h-5 text-sidebar-primary-foreground" />
-        </div>
+        <img
+          src="https://media.base44.com/images/public/69e096635a9256978131bd05/608378266_Asset12x.png"
+          alt="Sando Pay Icon"
+          className="w-9 h-9 rounded-xl flex-shrink-0 object-contain"
+        />
         {!collapsed && (
-          <div className="overflow-hidden">
-            <h1 className="text-lg font-bold text-sidebar-foreground tracking-tight">Sando Pay</h1>
-            <p className="text-[10px] uppercase tracking-widest text-sidebar-foreground/50 font-medium">Admin Panel</p>
-          </div>
+          <img
+            src="https://media.base44.com/images/public/69e096635a9256978131bd05/c6893f589_Asset22x.png"
+            alt="Sando Pay"
+            className="h-7 object-contain"
+          />
         )}
       </div>
 

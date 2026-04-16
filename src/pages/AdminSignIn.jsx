@@ -1,5 +1,4 @@
 import { base44 } from "@/api/base44Client";
-import { Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function AdminSignIn() {
@@ -19,11 +18,17 @@ export default function AdminSignIn() {
         <div className="bg-[hsl(222,47%,9%)] border border-white/10 rounded-2xl p-10 shadow-2xl">
           {/* Logo */}
           <div className="flex flex-col items-center mb-10">
-            <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-5">
-              <Shield className="w-8 h-8 text-primary" />
-            </div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">Sando Pay</h1>
-            <p className="text-sm text-slate-400 mt-1">Admin Operations Portal</p>
+            <img
+              src="https://media.base44.com/images/public/69e096635a9256978131bd05/608378266_Asset12x.png"
+              alt="Sando Pay Icon"
+              className="w-16 h-16 rounded-2xl object-contain mb-5"
+            />
+            <img
+              src="https://media.base44.com/images/public/69e096635a9256978131bd05/c6893f589_Asset22x.png"
+              alt="Sando Pay"
+              className="h-8 object-contain"
+            />
+            <p className="text-sm text-slate-400 mt-2">Admin Operations Portal</p>
           </div>
 
           <div className="border-t border-white/10 mb-8" />

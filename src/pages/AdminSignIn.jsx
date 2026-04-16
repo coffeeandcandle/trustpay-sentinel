@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 
 export default function AdminSignIn() {
   const handleLogin = () => {
-    base44.auth.redirectToLogin("/");
+    base44.auth.redirectToLogin(window.location.origin + "/");
   };
 
   return (

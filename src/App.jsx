@@ -46,6 +46,11 @@ const AuthenticatedApp = () => {
     return <AccessDeniedPage />;
   }
 
+  // Not yet authenticated - show sign in page
+  if (!user && !isLoadingAuth && !isLoadingPublicSettings) {
+    return <AdminSignIn />;
+  }
+
   return (
     <Routes>
       <Route element={<DashboardLayout />}>

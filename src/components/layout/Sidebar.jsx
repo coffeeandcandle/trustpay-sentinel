@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
   LayoutDashboard, Users, BarChart3, FileText, AlertTriangle, 
-  Bell, MessageCircle, ChevronLeft, ChevronRight, Shield, LogOut, Zap, Ticket
+  Bell, MessageCircle, ChevronLeft, ChevronRight, Shield, LogOut, Zap, Ticket, Settings
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { cn } from "@/lib/utils";
@@ -18,6 +18,7 @@ const navItems = [
   { path: "/notifications", label: "Notifications", icon: Bell },
   { path: "/chat", label: "Live Chat", icon: MessageCircle },
   { path: "/audit-logs", label: "Audit Logs", icon: Shield },
+  { path: "/settings", label: "Settings", icon: Settings },
 ];
 
 export default function Sidebar() {

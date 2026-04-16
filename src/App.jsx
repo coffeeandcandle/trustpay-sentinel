@@ -19,6 +19,7 @@ import AccessDeniedPage from './pages/AccessDeniedPage';
 import TicketsPage from './pages/TicketsPage';
 import AdminSignIn from './pages/AdminSignIn';
 import AuditLogsPage from './pages/AuditLogsPage';
+import SettingsPage from './pages/SettingsPage';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, user } = useAuth();
@@ -65,6 +66,7 @@ const AuthenticatedApp = () => {
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/tickets" element={<TicketsPage />} />
         <Route path="/audit-logs" element={<AuditLogsPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Route>
       <Route path="/admin-signin" element={<AdminSignIn />} />
       <Route path="*" element={<PageNotFound />} />

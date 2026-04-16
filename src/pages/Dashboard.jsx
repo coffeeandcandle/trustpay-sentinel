@@ -49,30 +49,26 @@ export default function Dashboard() {
         <StatCard
           title="Total Volume"
           value={`AED ${totalVolume.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
-          icon={<Zap className="w-5 h-5" />}
-          change={0}
-          bg="bg-primary/10"
+          icon={Zap}
+          iconBg="bg-primary/10"
         />
         <StatCard
           title="Registered Users"
           value={users.length}
-          icon={<Users className="w-5 h-5" />}
-          change={0}
-          bg="bg-emerald-500/10"
+          icon={Users}
+          iconBg="bg-emerald-500/10"
         />
         <StatCard
           title="Open Disputes"
           value={openDisputes}
-          icon={<AlertTriangle className="w-5 h-5" />}
-          change={0}
-          bg="bg-orange-500/10"
+          icon={AlertTriangle}
+          iconBg="bg-orange-500/10"
         />
         <StatCard
           title="Success Rate"
           value={`${successRate}%`}
-          icon={<TrendingUp className="w-5 h-5" />}
-          change={0}
-          bg="bg-teal-500/10"
+          icon={TrendingUp}
+          iconBg="bg-teal-500/10"
         />
       </div>
 

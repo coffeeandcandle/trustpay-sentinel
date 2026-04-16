@@ -31,17 +31,17 @@ export default function Sidebar() {
       collapsed ? "w-[72px]" : "w-[260px]"
     )}>
       {/* Logo */}
-      <div className="flex items-center gap-3 px-5 h-[72px] border-b border-sidebar-border">
+      <div className="flex items-center gap-2 px-4 h-[72px] border-b border-sidebar-border overflow-hidden">
         <img
           src="https://media.base44.com/images/public/69e096635a9256978131bd05/608378266_Asset12x.png"
           alt="Sando Pay Icon"
-          className="w-9 h-9 rounded-xl flex-shrink-0 object-contain"
+          className="w-8 h-8 rounded-lg flex-shrink-0 object-contain"
         />
         {!collapsed && (
           <img
             src="https://media.base44.com/images/public/69e096635a9256978131bd05/c6893f589_Asset22x.png"
             alt="Sando Pay"
-            className="h-7 object-contain"
+            className="h-5 object-contain max-w-[140px]"
           />
         )}
       </div>

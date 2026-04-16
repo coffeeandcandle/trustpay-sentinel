@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageCircle, Send, User, Headphones, Circle, CheckCircle2, Clock } from "lucide-react";
+import { MessageCircle, Send, User, Headphones, CheckCircle2, Plus, X } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +20,9 @@ export default function ChatPage() {
   const [selectedConvo, setSelectedConvo] = useState(null);
   const [messageText, setMessageText] = useState("");
   const [adminUser, setAdminUser] = useState(null);
+  const [showNewForm, setShowNewForm] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [newSubject, setNewSubject] = useState("");
   const messagesEndRef = useRef(null);
   const queryClient = useQueryClient();
 
@@ -73,20 +76,54 @@ export default function ChatPage() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["conversations"] }),
   });
 
+  const newConvoMutation = useMutation({
+    mutationFn: async () => {
+      const convo = await base44.entities.ChatConversation.create({
+        user_email: newEmail.trim(),
+        user_name: newEmail.trim().split("@")[0],
+        subject: newSubject.trim() || "Admin initiated chat",
+        status: "active",
+        assigned_to: adminUser?.email,
+      });
+      return convo;
+    },
+    onSuccess: (convo) => {
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      setSelectedConvo(convo);
+      setShowNewForm(false);
+      setNewEmail("");
+      setNewSubject("");
+    },
+  });
+
   const handleSend = () => {
     if (!messageText.trim()) return;
     sendMutation.mutate(messageText.trim());
   };
 
   return (
-    <div className="h-screen flex">
+    <div className="flex" style={{ height: "calc(100vh - 72px)" }}>
       {/* Conversations List */}
       <div className="w-[340px] border-r border-border bg-card flex flex-col">
         <div className="p-5 border-b border-border">
-          <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-            <Headphones className="w-5 h-5 text-primary" /> Live Chat
-          </h2>
-          <p className="text-xs text-muted-foreground mt-1">{conversations.filter(c => c.status === "waiting" || c.status === "active").length} active conversations</p>
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+              <Headphones className="w-5 h-5 text-primary" /> Live Chat
+            </h2>
+            <Button size="icon" variant="ghost" className="w-7 h-7" onClick={() => setShowNewForm(v => !v)}>
+              {showNewForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">{conversations.filter(c => c.status === "waiting" || c.status === "active").length} active conversations</p>
+          {showNewForm && (
+            <div className="mt-3 space-y-2">
+              <Input placeholder="User email..." value={newEmail} onChange={e => setNewEmail(e.target.value)} className="text-xs h-8" />
+              <Input placeholder="Subject (optional)..." value={newSubject} onChange={e => setNewSubject(e.target.value)} className="text-xs h-8" />
+              <Button size="sm" className="w-full text-xs h-8" disabled={!newEmail.trim()} onClick={() => newConvoMutation.mutate()}>
+                Start Conversation
+              </Button>
+            </div>
+          )}
         </div>
         <ScrollArea className="flex-1">
           <div className="p-2 space-y-1">

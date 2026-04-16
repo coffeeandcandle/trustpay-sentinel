@@ -17,6 +17,7 @@ import ChatPage from './pages/ChatPage';
 import TransactionsPage from './pages/TransactionsPage';
 import AccessDeniedPage from './pages/AccessDeniedPage';
 import TicketsPage from './pages/TicketsPage';
+import AdminSignIn from './pages/AdminSignIn';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, user } = useAuth();
@@ -36,8 +37,7 @@ const AuthenticatedApp = () => {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
     } else if (authError.type === 'auth_required') {
-      navigateToLogin();
-      return null;
+      return <AdminSignIn />;
     }
   }
 
@@ -59,6 +59,7 @@ const AuthenticatedApp = () => {
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/tickets" element={<TicketsPage />} />
       </Route>
+      <Route path="/admin-signin" element={<AdminSignIn />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

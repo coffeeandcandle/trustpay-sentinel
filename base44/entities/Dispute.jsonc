@@ -2,6 +2,10 @@
   "name": "Dispute",
   "type": "object",
   "properties": {
+    "ticket_number": {
+      "type": "string",
+      "description": "Auto-assigned ticket number e.g. TKT-0001"
+    },
     "transaction_id": {
       "type": "string",
       "description": "Related transaction ID"

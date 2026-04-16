@@ -50,7 +50,8 @@ export default function DisputesPage() {
   const filtered = disputes.filter(d => {
     const matchSearch = !search || 
       d.transaction_id?.toLowerCase().includes(search.toLowerCase()) || 
-      d.user_email?.toLowerCase().includes(search.toLowerCase());
+      d.user_email?.toLowerCase().includes(search.toLowerCase()) ||
+      d.ticket_number?.toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter === "all" || d.status === statusFilter;
     return matchSearch && matchStatus;
   });
@@ -84,6 +85,7 @@ export default function DisputesPage() {
         <table className="w-full">
           <thead>
             <tr className="border-b border-border">
+              <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-6 py-4">Ticket</th>
               <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-6 py-4">Transaction</th>
               <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-6 py-4">User</th>
               <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-6 py-4">Amount</th>
@@ -114,6 +116,11 @@ export default function DisputesPage() {
               const status = statusStyles[d.status] || statusStyles.open;
               return (
                 <tr key={d.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
+                  <td className="px-6 py-4">
+                   <span className="text-xs font-bold font-mono bg-primary/10 text-primary px-2 py-1 rounded-md">
+                     {d.ticket_number || "Pending..."}
+                   </span>
+                  </td>
                   <td className="px-6 py-4 text-sm font-mono text-foreground">{d.transaction_id}</td>
                   <td className="px-6 py-4 text-sm text-muted-foreground">{d.user_email}</td>
                   <td className="px-6 py-4 text-sm font-semibold text-foreground">${d.amount?.toLocaleString()}</td>
@@ -139,6 +146,13 @@ export default function DisputesPage() {
           <DialogHeader><DialogTitle className="flex items-center gap-2"><ShieldAlert className="w-5 h-5 text-primary" /> Dispute Details</DialogTitle></DialogHeader>
           {selected && (
             <div className="space-y-4 mt-2">
+              {selected.ticket_number && (
+                <div className="flex items-center gap-2 bg-primary/5 border border-primary/20 rounded-lg px-4 py-2.5">
+                  <ShieldAlert className="w-4 h-4 text-primary" />
+                  <span className="text-sm text-muted-foreground">Ticket</span>
+                  <span className="text-sm font-bold font-mono text-primary ml-auto">{selected.ticket_number}</span>
+                </div>
+              )}
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div><span className="text-muted-foreground">Transaction</span><p className="font-mono font-medium mt-0.5">{selected.transaction_id}</p></div>
                 <div><span className="text-muted-foreground">Amount</span><p className="font-semibold mt-0.5">${selected.amount?.toLocaleString()}</p></div>

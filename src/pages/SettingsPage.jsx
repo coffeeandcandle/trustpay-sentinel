@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import adminApi from "@/api/apiClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,7 +31,7 @@ export default function SettingsPage() {
   const [editPwUser, setEditPwUser] = useState(null);
   const [editPw, setEditPw] = useState("");
   const [showEditPw, setShowEditPw] = useState(false);
-  const [editPwLoading, setEditPwLoading] = useState(false);
+  const [editPwLoading] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("admin");
   const [currency, setCurrency] = useState(() => localStorage.getItem("platform_currency") || "AED");
@@ -39,11 +39,17 @@ export default function SettingsPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPw, setShowNewPw] = useState(false);
   const [showConfirmPw, setShowConfirmPw] = useState(false);
-  const [pwLoading, setPwLoading] = useState(false);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const handleChangePassword = async () => {
+  const saveCurrency = () => {
+    localStorage.setItem("platform_currency", currency);
+    toast({ title: "Currency updated", description: `Platform currency set to ${currency}.` });
+  };
+
+  // Password change is handled client-side via Supabase or the backend /api/auth/me
+  // For now, display a toast directing the user to use the auth flow
+  const handleChangePassword = () => {
     if (newPassword.length < 6) {
       toast({ title: "Error", description: "Password must be at least 6 characters.", variant: "destructive" });
       return;
@@ -52,40 +58,20 @@ export default function SettingsPage() {
       toast({ title: "Error", description: "Passwords do not match.", variant: "destructive" });
       return;
     }
-    setPwLoading(true);
-    try {
-      await base44.auth.updateMe({ password: newPassword });
-      toast({ title: "Password updated", description: "Your password has been changed successfully." });
-      setNewPassword("");
-      setConfirmPassword("");
-    } catch (err) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    } finally {
-      setPwLoading(false);
-    }
-  };
-
-  const saveCurrency = () => {
-    localStorage.setItem("platform_currency", currency);
-    toast({ title: "Currency updated", description: `Platform currency set to ${currency}.` });
+    toast({ title: "Not implemented", description: "Password changes require the Supabase Auth flow from the client.", variant: "destructive" });
   };
 
   const { data: users, isLoading } = useQuery({
-    queryKey: ["all-users"],
-    queryFn: async () => {
-      const res = await base44.functions.invoke("getUsers", {});
-      return (res.data.users || []).filter(u => u.role === "admin" || u.role === "view_only");
-    },
+    queryKey: ["admin-users"],
+    queryFn: () => adminApi.getAdmins(),
     initialData: [],
   });
 
   const inviteMutation = useMutation({
-    mutationFn: async () => {
-      await base44.users.inviteUser(inviteEmail.trim(), inviteRole);
-    },
+    mutationFn: () => adminApi.inviteAdmin({ email: inviteEmail.trim(), role: inviteRole }),
     onSuccess: () => {
       toast({ title: "Invite sent", description: `${inviteEmail} has been invited as ${inviteRole}.` });
-      queryClient.invalidateQueries({ queryKey: ["all-users"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
       setShowInvite(false);
       setInviteEmail("");
       setInviteRole("admin");
@@ -96,43 +82,21 @@ export default function SettingsPage() {
   });
 
   const removeAdminMutation = useMutation({
-    mutationFn: async (userId) => {
-      await base44.entities.User.update(userId, { role: "user" });
-    },
+    mutationFn: (userId) => adminApi.updateAdminRole(userId, { role: "user" }),
     onSuccess: () => {
       toast({ title: "Admin removed", description: "User role has been changed to regular user." });
-      queryClient.invalidateQueries({ queryKey: ["all-users"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
     },
     onError: (err) => {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     },
   });
 
-  const handleEditAdminPassword = async () => {
-    if (editPw.length < 6) {
-      toast({ title: "Error", description: "Password must be at least 6 characters.", variant: "destructive" });
-      return;
-    }
-    setEditPwLoading(true);
-    try {
-      await base44.functions.invoke("updateAdminPassword", { userId: editPwUser.id, password: editPw });
-      toast({ title: "Password updated", description: `Password for ${editPwUser.full_name || editPwUser.email} has been changed.` });
-      setEditPwUser(null);
-      setEditPw("");
-    } catch (err) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    } finally {
-      setEditPwLoading(false);
-    }
-  };
-
   const changeRoleMutation = useMutation({
-    mutationFn: async ({ userId, role }) => {
-      await base44.entities.User.update(userId, { role });
-    },
+    mutationFn: ({ userId, role }) => adminApi.updateAdminRole(userId, { role }),
     onSuccess: () => {
       toast({ title: "Role updated", description: "User role has been updated." });
-      queryClient.invalidateQueries({ queryKey: ["all-users"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
     },
     onError: (err) => {
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -230,7 +194,11 @@ export default function SettingsPage() {
                   </Select>
                 </td>
                 <td className="px-6 py-4 text-sm text-muted-foreground">
-                  {user.created_date ? format(new Date(user.created_date), "MMM d, yyyy") : "—"}
+                  {user.created_at
+                    ? format(new Date(user.created_at), "MMM d, yyyy")
+                    : user.created_date
+                    ? format(new Date(user.created_date), "MMM d, yyyy")
+                    : "—"}
                 </td>
                 <td className="px-6 py-4 text-right">
                   <div className="flex items-center justify-end gap-2">
@@ -335,11 +303,11 @@ export default function SettingsPage() {
           </div>
           <Button
             onClick={handleChangePassword}
-            disabled={!newPassword || !confirmPassword || pwLoading}
+            disabled={!newPassword || !confirmPassword}
             className="gap-2"
           >
             <Lock className="w-4 h-4" />
-            {pwLoading ? "Updating..." : "Update Password"}
+            Update Password
           </Button>
         </div>
       </div>
@@ -379,7 +347,9 @@ export default function SettingsPage() {
               <Button
                 className="w-full gap-2"
                 disabled={!editPw || editPwLoading}
-                onClick={handleEditAdminPassword}
+                onClick={() => {
+                  toast({ title: "Not implemented", description: "Admin password reset requires a Supabase admin call from the backend.", variant: "destructive" });
+                }}
               >
                 <Lock className="w-4 h-4" />
                 {editPwLoading ? "Updating..." : "Update Password"}

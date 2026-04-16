@@ -1,5 +1,5 @@
 import React from "react";
-import { base44 } from "@/api/base44Client";
+import adminApi from "@/api/apiClient";
 import { useQuery } from "@tanstack/react-query";
 import StatCard from "@/components/dashboard/StatCard";
 import RevenueChart from "@/components/dashboard/RevenueChart";
@@ -12,22 +12,19 @@ import { Zap, Users, AlertTriangle, TrendingUp } from "lucide-react";
 export default function Dashboard() {
   const { data: transactions } = useQuery({
     queryKey: ["transactions"],
-    queryFn: () => base44.entities.Transaction.list("-created_date", 200),
+    queryFn: () => adminApi.getTransactions(),
     initialData: [],
   });
 
   const { data: disputes } = useQuery({
     queryKey: ["disputes"],
-    queryFn: () => base44.entities.Dispute.list("-created_date", 50),
+    queryFn: () => adminApi.getDisputes(),
     initialData: [],
   });
 
   const { data: users } = useQuery({
-    queryKey: ["users-count"],
-    queryFn: async () => {
-      const res = await base44.functions.invoke("getUsers", {});
-      return res.data.users || [];
-    },
+    queryKey: ["users"],
+    queryFn: () => adminApi.getUsers(),
     initialData: [],
   });
 

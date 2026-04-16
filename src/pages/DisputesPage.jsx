@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import adminApi from "@/api/apiClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,12 +35,12 @@ export default function DisputesPage() {
 
   const { data: disputes, isLoading } = useQuery({
     queryKey: ["disputes"],
-    queryFn: () => base44.entities.Dispute.list("-created_date"),
+    queryFn: () => adminApi.getDisputes(),
     initialData: [],
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Dispute.update(id, data),
+    mutationFn: ({ id, data }) => adminApi.updateDispute(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["disputes"] });
       setSelected(null);
@@ -49,8 +49,8 @@ export default function DisputesPage() {
   });
 
   const filtered = disputes.filter(d => {
-    const matchSearch = !search || 
-      d.transaction_id?.toLowerCase().includes(search.toLowerCase()) || 
+    const matchSearch = !search ||
+      d.transaction_id?.toLowerCase().includes(search.toLowerCase()) ||
       d.user_email?.toLowerCase().includes(search.toLowerCase()) ||
       d.ticket_number?.toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter === "all" || d.status === statusFilter;
@@ -109,7 +109,7 @@ export default function DisputesPage() {
               ))
             ) : filtered.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-6 py-12 text-center">
+                <td colSpan={9} className="px-6 py-12 text-center">
                   <AlertTriangle className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
                   <p className="text-sm text-muted-foreground">No disputes found</p>
                 </td>
@@ -119,9 +119,9 @@ export default function DisputesPage() {
               return (
                 <tr key={d.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
                   <td className="px-6 py-4">
-                   <span className="text-xs font-bold font-mono bg-primary/10 text-primary px-2 py-1 rounded-md">
-                     {d.ticket_number || "Pending..."}
-                   </span>
+                    <span className="text-xs font-bold font-mono bg-primary/10 text-primary px-2 py-1 rounded-md">
+                      {d.ticket_number || "Pending..."}
+                    </span>
                   </td>
                   <td className="px-6 py-4 text-sm font-mono text-foreground">{d.transaction_id}</td>
                   <td className="px-6 py-4 text-sm text-muted-foreground">{d.user_email}</td>

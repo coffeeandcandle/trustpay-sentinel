@@ -4,7 +4,6 @@ import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
-import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 
 import DashboardLayout from './components/layout/DashboardLayout';
 import Dashboard from './pages/Dashboard';
@@ -22,9 +21,9 @@ import AuditLogsPage from './pages/AuditLogsPage';
 import SettingsPage from './pages/SettingsPage';
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, user } = useAuth();
+  const { isLoadingAuth, isAuthenticated, user } = useAuth();
 
-  if (isLoadingPublicSettings || isLoadingAuth) {
+  if (isLoadingAuth) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-[hsl(222,47%,11%)]">
         <div className="flex flex-col items-center gap-3">
@@ -35,21 +34,13 @@ const AuthenticatedApp = () => {
     );
   }
 
-  if (authError) {
-    if (authError.type === 'user_not_registered') {
-      return <UserNotRegisteredError />;
-    } else if (authError.type === 'auth_required') {
-      return <AdminSignIn />;
-    }
-  }
-
   // Block non-admin / non-view_only users
   if (user && user.role !== 'admin' && user.role !== 'view_only') {
     return <AccessDeniedPage />;
   }
 
-  // Not yet authenticated - show sign in page
-  if (!user && !isLoadingAuth && !isLoadingPublicSettings) {
+  // Not yet authenticated — show sign in page
+  if (!isAuthenticated) {
     return <AdminSignIn />;
   }
 

@@ -1,9 +1,26 @@
-import { base44 } from "@/api/base44Client";
+import { useState } from "react";
+import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function AdminSignIn() {
-  const handleLogin = () => {
-    base44.auth.redirectToLogin(window.location.origin + "/");
+  const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      await login(email, password);
+    } catch (err) {
+      setError(err.message || "Sign in failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -33,16 +50,50 @@ export default function AdminSignIn() {
 
           <div className="border-t border-white/10 mb-8" />
 
-          <p className="text-slate-300 text-sm text-center mb-8">
-            This portal is restricted to authorized Sando Pay administrators only.
-          </p>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                Email
+              </label>
+              <Input
+                type="email"
+                placeholder="admin@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+                className="bg-white/5 border-white/10 text-white placeholder:text-slate-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-1.5">
+                Password
+              </label>
+              <Input
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+                className="bg-white/5 border-white/10 text-white placeholder:text-slate-500"
+              />
+            </div>
 
-          <Button
-            onClick={handleLogin}
-            className="w-full h-11 text-sm font-semibold bg-primary hover:bg-primary/90 text-white rounded-xl"
-          >
-            Sign in to Admin Portal
-          </Button>
+            {error && (
+              <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                {error}
+              </p>
+            )}
+
+            <Button
+              type="submit"
+              disabled={loading || !email || !password}
+              className="w-full h-11 text-sm font-semibold bg-primary hover:bg-primary/90 text-white rounded-xl mt-2"
+            >
+              {loading ? "Signing in..." : "Sign in to Admin Portal"}
+            </Button>
+          </form>
 
           <p className="text-xs text-slate-500 text-center mt-6">
             Unauthorized access is prohibited and monitored.

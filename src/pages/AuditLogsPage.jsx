@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import adminApi from "@/api/apiClient";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { Search, ShieldCheck, User, AlertTriangle, FileText, Bell, Zap, Ticket } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -51,18 +50,19 @@ export default function AuditLogsPage() {
 
   const { data: logs, isLoading } = useQuery({
     queryKey: ["audit-logs"],
-    queryFn: () => base44.entities.AuditLog.list("-created_date", 300),
+    queryFn: () => adminApi.getAuditLogs(),
     initialData: [],
     refetchInterval: 30000,
   });
 
   const filtered = logs.filter(log => {
+    const detailsStr = log.details ? JSON.stringify(log.details) : "";
     const matchSearch = !search ||
       log.admin_email?.toLowerCase().includes(search.toLowerCase()) ||
       log.admin_name?.toLowerCase().includes(search.toLowerCase()) ||
       log.target_label?.toLowerCase().includes(search.toLowerCase()) ||
       log.target_id?.toLowerCase().includes(search.toLowerCase()) ||
-      log.details?.toLowerCase().includes(search.toLowerCase());
+      detailsStr.toLowerCase().includes(search.toLowerCase());
     const matchAction = actionFilter === "all" || log.action === actionFilter;
     const matchTarget = targetFilter === "all" || log.target_type === targetFilter;
     const matchSeverity = severityFilter === "all" || log.severity === severityFilter;
@@ -164,6 +164,9 @@ export default function AuditLogsPage() {
               </tr>
             ) : filtered.map(log => {
               const TargetIcon = targetIcons[log.target_type] || ShieldCheck;
+              const detailsStr = log.details
+                ? (typeof log.details === "string" ? log.details : JSON.stringify(log.details))
+                : "—";
               return (
                 <tr key={log.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
                   <td className="px-6 py-4 text-xs text-muted-foreground whitespace-nowrap">
@@ -204,7 +207,7 @@ export default function AuditLogsPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-muted-foreground max-w-[200px] truncate">
-                    {log.details || "—"}
+                    {detailsStr}
                   </td>
                 </tr>
               );

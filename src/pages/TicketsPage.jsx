@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import adminApi from "@/api/apiClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,12 +45,12 @@ export default function TicketsPage() {
 
   const { data: tickets, isLoading } = useQuery({
     queryKey: ["tickets"],
-    queryFn: () => base44.entities.Ticket.list("-created_date"),
+    queryFn: () => adminApi.getTickets(),
     initialData: [],
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Ticket.update(id, data),
+    mutationFn: ({ id, data }) => adminApi.updateTicket(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tickets"] });
       setSelected(null);
@@ -215,7 +215,7 @@ export default function TicketsPage() {
 
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div><span className="text-muted-foreground">User</span><p className="font-medium mt-0.5">{selected.user_email}</p></div>
-                <div><span className="text-muted-foreground">Category</span><p className="mt-0.5">{categoryLabels[selected.category]}</p></div>
+                <div><span className="text-muted-foreground">Category</span><p className="mt-0.5">{categoryLabels[selected.category] || selected.category}</p></div>
                 <div><span className="text-muted-foreground">Priority</span>
                   <p className="mt-0.5">
                     <span className={cn("text-xs font-medium px-2 py-0.5 rounded-full capitalize", priorityStyles[selected.priority])}>

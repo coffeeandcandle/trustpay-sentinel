@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import adminApi from "@/api/apiClient";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, Users, Mail, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import UserActionDialog from "@/components/users/UserActionDialog";
 import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
 
 const verificationStyles = {
   unverified:          { label: "Unverified",        cls: "bg-muted text-muted-foreground" },
@@ -27,7 +27,6 @@ const planStyles = {
   pro:      "bg-primary/10 text-primary",
   business: "bg-purple-500/10 text-purple-600",
 };
-import { format } from "date-fns";
 
 export default function UsersPage() {
   const [search, setSearch] = useState("");
@@ -37,16 +36,13 @@ export default function UsersPage() {
 
   const { data: users, isLoading } = useQuery({
     queryKey: ["users"],
-    queryFn: async () => {
-      const res = await base44.functions.invoke("getUsers", {});
-      return res.data.users || [];
-    },
+    queryFn: () => adminApi.getUsers(),
     initialData: [],
   });
 
   const filtered = users.filter(u => {
-    const matchSearch = !search || 
-      u.full_name?.toLowerCase().includes(search.toLowerCase()) || 
+    const matchSearch = !search ||
+      u.full_name?.toLowerCase().includes(search.toLowerCase()) ||
       u.email?.toLowerCase().includes(search.toLowerCase()) ||
       u.phone?.toLowerCase().includes(search.toLowerCase());
     const matchRole = roleFilter === "all" || u.role === roleFilter;
@@ -84,10 +80,10 @@ export default function UsersPage() {
           </Select>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search users..." 
-              value={search} 
-              onChange={e => setSearch(e.target.value)} 
+            <Input
+              placeholder="Search users..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
               className="pl-9 w-[260px]"
             />
           </div>
@@ -115,6 +111,9 @@ export default function UsersPage() {
                   <td className="px-6 py-4"><div className="h-4 w-48 bg-muted rounded" /></td>
                   <td className="px-6 py-4"><div className="h-5 w-16 bg-muted rounded-full" /></td>
                   <td className="px-6 py-4"><div className="h-4 w-24 bg-muted rounded" /></td>
+                  <td className="px-6 py-4"><div className="h-4 w-16 bg-muted rounded" /></td>
+                  <td className="px-6 py-4"><div className="h-4 w-24 bg-muted rounded" /></td>
+                  <td className="px-6 py-4"></td>
                 </tr>
               ))
             ) : filtered.length === 0 ? (
@@ -143,34 +142,38 @@ export default function UsersPage() {
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                 {(() => {
-                   const v = verificationStyles[user.verification_level] || verificationStyles.unverified;
-                   return <span className={cn("text-xs font-medium px-2 py-0.5 rounded-full", v.cls)}>{v.label}</span>;
-                 })()}
+                  {(() => {
+                    const v = verificationStyles[user.verification_level] || verificationStyles.unverified;
+                    return <span className={cn("text-xs font-medium px-2 py-0.5 rounded-full", v.cls)}>{v.label}</span>;
+                  })()}
                 </td>
                 <td className="px-6 py-4">
-                 {(() => {
-                   const s = accountStatusStyles[user.account_status] || accountStatusStyles.active;
-                   return <span className={cn("text-xs font-medium px-2 py-0.5 rounded-full", s.cls)}>{s.label}</span>;
-                 })()}
+                  {(() => {
+                    const s = accountStatusStyles[user.account_status] || accountStatusStyles.active;
+                    return <span className={cn("text-xs font-medium px-2 py-0.5 rounded-full", s.cls)}>{s.label}</span>;
+                  })()}
                 </td>
                 <td className="px-6 py-4">
-                 <span className={cn("text-xs font-medium px-2 py-0.5 rounded-full capitalize", planStyles[user.subscription_plan] || planStyles.free)}>
-                   {user.subscription_plan || "free"}
-                 </span>
+                  <span className={cn("text-xs font-medium px-2 py-0.5 rounded-full capitalize", planStyles[user.subscription_plan] || planStyles.free)}>
+                    {user.subscription_plan || "free"}
+                  </span>
                 </td>
                 <td className="px-6 py-4">
-                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                   <Calendar className="w-3.5 h-3.5" />
-                   {user.created_date ? format(new Date(user.created_date), "MMM d, yyyy") : "—"}
-                 </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Calendar className="w-3.5 h-3.5" />
+                    {user.created_at
+                      ? format(new Date(user.created_at), "MMM d, yyyy")
+                      : user.created_date
+                      ? format(new Date(user.created_date), "MMM d, yyyy")
+                      : "—"}
+                  </div>
                 </td>
                 <td className="px-6 py-4 text-right">
                   <Button variant="ghost" size="sm" className="text-xs" onClick={() => setSelectedUser(user)}>
                     Manage
                   </Button>
                 </td>
-                </tr>
+              </tr>
             ))}
           </tbody>
         </table>

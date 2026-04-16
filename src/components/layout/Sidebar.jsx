@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { 
-  LayoutDashboard, Users, BarChart3, FileText, AlertTriangle, 
+import {
+  LayoutDashboard, Users, BarChart3, FileText, AlertTriangle,
   Bell, MessageCircle, ChevronLeft, ChevronRight, Shield, LogOut, Zap, Ticket, Settings
 } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -24,6 +24,7 @@ const navItems = [
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const { logout } = useAuth();
 
   return (
     <aside className={cn(
@@ -71,7 +72,7 @@ export default function Sidebar() {
       {/* Footer */}
       <div className="p-3 border-t border-sidebar-border space-y-1">
         <button
-          onClick={() => base44.auth.logout(window.location.origin + "/admin-signin")}
+          onClick={logout}
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent w-full transition-colors"
         >
           <LogOut className="w-5 h-5 flex-shrink-0" />

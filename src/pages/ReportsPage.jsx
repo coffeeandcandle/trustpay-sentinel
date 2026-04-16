@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import adminApi from "@/api/apiClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,12 +23,17 @@ export default function ReportsPage() {
 
   const { data: reports, isLoading } = useQuery({
     queryKey: ["reports"],
-    queryFn: () => base44.entities.Report.list("-created_date"),
+    queryFn: () => adminApi.getReports(),
     initialData: [],
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Report.create({ ...data, status: "ready", total_transactions: Math.floor(Math.random() * 5000), total_amount: Math.floor(Math.random() * 500000) }),
+    mutationFn: (data) => adminApi.createReport({
+      ...data,
+      status: "ready",
+      total_transactions: Math.floor(Math.random() * 5000),
+      total_amount: Math.floor(Math.random() * 500000),
+    }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reports"] });
       setOpen(false);
@@ -77,7 +82,9 @@ export default function ReportsPage() {
                   <Input type="date" value={form.date_range_end} onChange={e => setForm({ ...form, date_range_end: e.target.value })} className="mt-1.5" />
                 </div>
               </div>
-              <Button onClick={() => createMutation.mutate(form)} disabled={!form.title} className="w-full">Generate</Button>
+              <Button onClick={() => createMutation.mutate(form)} disabled={!form.title || createMutation.isPending} className="w-full">
+                {createMutation.isPending ? "Generating..." : "Generate"}
+              </Button>
             </div>
           </DialogContent>
         </Dialog>

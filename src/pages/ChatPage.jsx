@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { base44 } from "@/api/base44Client";
+import adminApi from "@/api/apiClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/lib/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -10,36 +11,32 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
 const statusConfig = {
-  waiting: { label: "Waiting", color: "bg-amber-500/10 text-amber-600", dot: "bg-amber-500" },
-  active: { label: "Active", color: "bg-emerald-500/10 text-emerald-600", dot: "bg-emerald-500" },
-  resolved: { label: "Resolved", color: "bg-muted text-muted-foreground", dot: "bg-muted-foreground" },
-  closed: { label: "Closed", color: "bg-muted text-muted-foreground", dot: "bg-muted-foreground" },
+  waiting:  { label: "Waiting",  color: "bg-amber-500/10 text-amber-600",      dot: "bg-amber-500" },
+  active:   { label: "Active",   color: "bg-emerald-500/10 text-emerald-600",  dot: "bg-emerald-500" },
+  resolved: { label: "Resolved", color: "bg-muted text-muted-foreground",       dot: "bg-muted-foreground" },
+  closed:   { label: "Closed",   color: "bg-muted text-muted-foreground",       dot: "bg-muted-foreground" },
 };
 
 export default function ChatPage() {
   const [selectedConvo, setSelectedConvo] = useState(null);
   const [messageText, setMessageText] = useState("");
-  const [adminUser, setAdminUser] = useState(null);
   const [showNewForm, setShowNewForm] = useState(false);
   const [newEmail, setNewEmail] = useState("");
   const [newSubject, setNewSubject] = useState("");
   const messagesEndRef = useRef(null);
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    base44.auth.me().then(setAdminUser).catch(() => {});
-  }, []);
+  const { user: adminUser } = useAuth();
 
   const { data: conversations } = useQuery({
     queryKey: ["conversations"],
-    queryFn: () => base44.entities.ChatConversation.list("-updated_date"),
+    queryFn: () => adminApi.getConversations(),
     initialData: [],
     refetchInterval: 5000,
   });
 
   const { data: messages } = useQuery({
     queryKey: ["messages", selectedConvo?.id],
-    queryFn: () => selectedConvo ? base44.entities.ChatMessage.filter({ conversation_id: selectedConvo.id }, "created_date") : [],
+    queryFn: () => selectedConvo ? adminApi.getMessages(selectedConvo.id) : [],
     initialData: [],
     enabled: !!selectedConvo,
     refetchInterval: 3000,
@@ -51,17 +48,12 @@ export default function ChatPage() {
 
   const sendMutation = useMutation({
     mutationFn: async (content) => {
-      await base44.entities.ChatMessage.create({
+      await adminApi.createMessage({
         conversation_id: selectedConvo.id,
         sender_type: "admin",
         sender_name: adminUser?.full_name || "Admin",
         sender_email: adminUser?.email || "",
         content,
-      });
-      await base44.entities.ChatConversation.update(selectedConvo.id, {
-        status: "active",
-        last_message: content,
-        assigned_to: adminUser?.email,
       });
     },
     onSuccess: () => {
@@ -72,13 +64,13 @@ export default function ChatPage() {
   });
 
   const resolveMutation = useMutation({
-    mutationFn: (id) => base44.entities.ChatConversation.update(id, { status: "resolved" }),
+    mutationFn: (id) => adminApi.updateConversation(id, { status: "resolved" }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["conversations"] }),
   });
 
   const newConvoMutation = useMutation({
     mutationFn: async () => {
-      const convo = await base44.entities.ChatConversation.create({
+      const convo = await adminApi.createConversation({
         user_email: newEmail.trim(),
         user_name: newEmail.trim().split("@")[0],
         subject: newSubject.trim() || "Admin initiated chat",
@@ -119,7 +111,7 @@ export default function ChatPage() {
             <div className="mt-3 space-y-2">
               <Input placeholder="User email..." value={newEmail} onChange={e => setNewEmail(e.target.value)} className="text-xs h-8" />
               <Input placeholder="Subject (optional)..." value={newSubject} onChange={e => setNewSubject(e.target.value)} className="text-xs h-8" />
-              <Button size="sm" className="w-full text-xs h-8" disabled={!newEmail.trim()} onClick={() => newConvoMutation.mutate()}>
+              <Button size="sm" className="w-full text-xs h-8" disabled={!newEmail.trim() || newConvoMutation.isPending} onClick={() => newConvoMutation.mutate()}>
                 Start Conversation
               </Button>
             </div>

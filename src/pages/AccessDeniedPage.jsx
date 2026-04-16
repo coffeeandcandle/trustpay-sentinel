@@ -1,9 +1,11 @@
 import React from "react";
 import { ShieldX, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 
 export default function AccessDeniedPage() {
+  const { logout } = useAuth();
+
   return (
     <div className="min-h-screen bg-sidebar flex items-center justify-center p-4">
       <div className="relative w-full max-w-sm text-center">
@@ -13,13 +15,13 @@ export default function AccessDeniedPage() {
           </div>
           <h1 className="text-xl font-bold text-sidebar-foreground">Access Denied</h1>
           <p className="text-sm text-sidebar-foreground/50 mt-2 leading-relaxed">
-            Your account does not have permission to access the TrustPay Admin Portal. 
+            Your account does not have permission to access the TrustPay Admin Portal.
             Please contact your IT administrator if you believe this is an error.
           </p>
           <Button
             variant="outline"
             className="mt-6 gap-2 border-sidebar-border text-sidebar-foreground/70 hover:text-sidebar-foreground"
-            onClick={() => base44.auth.logout()}
+            onClick={logout}
           >
             <LogOut className="w-4 h-4" /> Sign Out
           </Button>

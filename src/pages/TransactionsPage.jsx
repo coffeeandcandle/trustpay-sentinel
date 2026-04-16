@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
-import { base44 } from "@/api/base44Client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import React, { useState, useRef } from "react";
+import adminApi from "@/api/apiClient";
+import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, ArrowUpRight, ArrowDownLeft, RefreshCw, Zap, AlertOctagon } from "lucide-react";
 import { format } from "date-fns";
@@ -25,33 +24,19 @@ const typeIcons = {
 };
 
 export default function TransactionsPage() {
-  const [search, setSearch]         = useState("");
-  const [statusFilter, setStatus]   = useState("all");
-  const [typeFilter, setType]       = useState("all");
-  const [newIds, setNewIds]         = useState(new Set());
-  const prevCountRef                = useRef(0);
-  const queryClient                 = useQueryClient();
+  const [search, setSearch]       = useState("");
+  const [statusFilter, setStatus] = useState("all");
+  const [typeFilter, setType]     = useState("all");
 
   const { data: transactions, isLoading } = useQuery({
     queryKey: ["transactions"],
-    queryFn: () => base44.entities.Transaction.list("-created_date", 200),
+    queryFn: () => adminApi.getTransactions(),
     initialData: [],
+    refetchInterval: 5000,
   });
 
-  // Real-time subscription
-  useEffect(() => {
-    const unsub = base44.entities.Transaction.subscribe((event) => {
-      if (event.type === "create") {
-        setNewIds(prev => new Set([...prev, event.id]));
-        setTimeout(() => setNewIds(prev => { const n = new Set(prev); n.delete(event.id); return n; }), 4000);
-      }
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
-    });
-    return unsub;
-  }, [queryClient]);
-
   const filtered = transactions.filter(t => {
-    const matchSearch  = !search || 
+    const matchSearch  = !search ||
       t.transaction_id?.toLowerCase().includes(search.toLowerCase()) ||
       t.sender_email?.toLowerCase().includes(search.toLowerCase()) ||
       t.recipient_email?.toLowerCase().includes(search.toLowerCase());
@@ -60,9 +45,9 @@ export default function TransactionsPage() {
     return matchSearch && matchStatus && matchType;
   });
 
-  const totalVolume   = filtered.reduce((s, t) => s + (t.amount || 0), 0);
-  const flaggedCount  = filtered.filter(t => t.flagged || t.status === "disputed").length;
-  const pendingCount  = filtered.filter(t => t.status === "pending" || t.status === "sender_ok").length;
+  const totalVolume  = filtered.reduce((s, t) => s + (t.amount || 0), 0);
+  const flaggedCount = filtered.filter(t => t.flagged || t.status === "disputed").length;
+  const pendingCount = filtered.filter(t => t.status === "pending" || t.status === "sender_ok").length;
 
   return (
     <div className="p-8">
@@ -157,15 +142,13 @@ export default function TransactionsPage() {
             ) : (
               <AnimatePresence>
                 {filtered.map(tx => {
-                  const status  = statusStyles[tx.status] || statusStyles.pending;
-                  const TxIcon  = typeIcons[tx.type] || ArrowUpRight;
-                  const isNew   = newIds.has(tx.id);
+                  const status = statusStyles[tx.status] || statusStyles.pending;
+                  const TxIcon = typeIcons[tx.type] || ArrowUpRight;
                   return (
                     <motion.tr
                       key={tx.id}
-                      initial={isNew ? { backgroundColor: "hsl(217 91% 60% / 0.12)" } : false}
-                      animate={{ backgroundColor: "hsl(0 0% 100% / 0)" }}
-                      transition={{ duration: 3 }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
                       className={cn(
                         "border-b border-border/50 hover:bg-muted/30 transition-colors",
                         (tx.flagged || tx.status === "disputed") && "bg-orange-500/5"
@@ -175,8 +158,8 @@ export default function TransactionsPage() {
                       <td className="px-5 py-3.5 text-sm text-muted-foreground">{tx.sender_name || tx.sender_email || "—"}</td>
                       <td className="px-5 py-3.5 text-sm text-muted-foreground">{tx.recipient_name || tx.recipient_email || "—"}</td>
                       <td className="px-5 py-3.5">
-                       <span className="text-sm font-semibold text-foreground">AED {tx.amount?.toLocaleString()}</span>
-                       {tx.fee > 0 && <span className="text-xs text-muted-foreground ml-1">+AED {tx.fee} fee</span>}
+                        <span className="text-sm font-semibold text-foreground">AED {tx.amount?.toLocaleString()}</span>
+                        {tx.fee > 0 && <span className="text-xs text-muted-foreground ml-1">+AED {tx.fee} fee</span>}
                       </td>
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-1.5 text-sm text-muted-foreground capitalize">
@@ -187,14 +170,12 @@ export default function TransactionsPage() {
                         <span className={cn("text-xs font-medium px-2.5 py-1 rounded-full border", status.cls)}>{status.label}</span>
                       </td>
                       <td className="px-5 py-3.5 text-xs text-muted-foreground whitespace-nowrap">
-                        {tx.created_date ? format(new Date(tx.created_date), "MMM d, HH:mm:ss") : "—"}
+                        {tx.created_at ? format(new Date(tx.created_at), "MMM d, HH:mm:ss") :
+                         tx.created_date ? format(new Date(tx.created_date), "MMM d, HH:mm:ss") : "—"}
                       </td>
                       <td className="px-5 py-3.5">
                         {(tx.flagged || tx.status === "disputed") && (
                           <AlertOctagon className="w-4 h-4 text-orange-500" />
-                        )}
-                        {isNew && (
-                          <span className="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">NEW</span>
                         )}
                       </td>
                     </motion.tr>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import adminApi from "@/api/apiClient";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Bell, Plus, Send, Clock, CheckCircle2, Info, AlertTriangle, Megaphone, RefreshCw, ShieldCheck } from "lucide-react";
+import { Bell, Plus, Send, CheckCircle2, Info, AlertTriangle, Megaphone, RefreshCw, ShieldCheck } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -37,12 +37,12 @@ export default function NotificationsPage() {
 
   const { data: notifications, isLoading } = useQuery({
     queryKey: ["notifications"],
-    queryFn: () => base44.entities.Notification.list("-created_date"),
+    queryFn: () => adminApi.getNotifications(),
     initialData: [],
   });
 
   const sendMutation = useMutation({
-    mutationFn: (data) => base44.entities.Notification.create({ ...data, status: "sent", sent_at: new Date().toISOString() }),
+    mutationFn: (data) => adminApi.createNotification(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
       setOpen(false);
@@ -105,8 +105,13 @@ export default function NotificationsPage() {
                   <Input value={form.target_email} onChange={e => setForm({ ...form, target_email: e.target.value })} placeholder="user@example.com" className="mt-1.5" />
                 </div>
               )}
-              <Button onClick={() => sendMutation.mutate(form)} disabled={!form.title || !form.message} className="w-full gap-2">
-                <Send className="w-4 h-4" /> Send Notification
+              <Button
+                onClick={() => sendMutation.mutate(form)}
+                disabled={!form.title || !form.message || sendMutation.isPending}
+                className="w-full gap-2"
+              >
+                <Send className="w-4 h-4" />
+                {sendMutation.isPending ? "Sending..." : "Send Notification"}
               </Button>
             </div>
           </DialogContent>
@@ -137,7 +142,7 @@ export default function NotificationsPage() {
           return (
             <div key={n.id} className="bg-card rounded-2xl border border-border/50 p-5 hover:border-primary/20 transition-all">
               <div className="flex items-start gap-4">
-                <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0", typeColors[n.type])}>
+                <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0", typeColors[n.type] || typeColors.info)}>
                   <TypeIcon className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">

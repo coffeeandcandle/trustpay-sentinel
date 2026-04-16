@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import adminApi from "@/api/apiClient";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ShieldCheck, ShieldOff, Ban, Trash2, CheckCircle2, Mail, Calendar, CreditCard } from "lucide-react";
 import { format } from "date-fns";
@@ -27,10 +26,7 @@ export default function UserActionDialog({ user, open, onClose }) {
   const queryClient = useQueryClient();
 
   const updateMutation = useMutation({
-    mutationFn: (data) => base44.auth.updateMe ? 
-      // Use service-role via backend fn since User entity has special restrictions
-      base44.functions.invoke("updateUserStatus", { userId: user.id, ...data }) :
-      Promise.resolve(),
+    mutationFn: (data) => adminApi.updateUserStatus(user.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
       setNotes("");
@@ -48,8 +44,9 @@ export default function UserActionDialog({ user, open, onClose }) {
   const accountStatus = accountStatusStyles[user.account_status] || accountStatusStyles.active;
   const isPending = user.verification_level === "pending_verification";
   const isActive = !user.account_status || user.account_status === "active";
-  const isSuspended = user.account_status === "suspended";
   const isBanned = user.account_status === "banned";
+
+  const joinedDate = user.created_at || user.created_date;
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -69,10 +66,10 @@ export default function UserActionDialog({ user, open, onClose }) {
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <Mail className="w-3.5 h-3.5" /> {user.email}
             </div>
-            {user.created_date && (
+            {joinedDate && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Calendar className="w-3.5 h-3.5" />
-                Joined {format(new Date(user.created_date), "MMM d, yyyy")}
+                Joined {format(new Date(joinedDate), "MMM d, yyyy")}
               </div>
             )}
             <div className="flex items-center gap-2 text-sm text-muted-foreground">

@@ -43,7 +43,7 @@ export default function SettingsPage() {
     queryKey: ["all-users"],
     queryFn: async () => {
       const res = await base44.functions.invoke("getUsers", {});
-      return (res.data.users || []).filter(u => u.role === "admin");
+      return (res.data.users || []).filter(u => u.role === "admin" || u.role === "view_only");
     },
     initialData: [],
   });
@@ -145,10 +145,17 @@ export default function SettingsPage() {
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <div className="flex items-center gap-1.5">
-                    <Crown className="w-3.5 h-3.5 text-amber-500" />
-                    <span className="text-xs font-medium text-amber-600 bg-amber-500/10 px-2 py-0.5 rounded-full capitalize">{user.role}</span>
-                  </div>
+                  {user.role === "admin" ? (
+                    <div className="flex items-center gap-1.5">
+                      <Crown className="w-3.5 h-3.5 text-amber-500" />
+                      <span className="text-xs font-medium text-amber-600 bg-amber-500/10 px-2 py-0.5 rounded-full">Admin</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1.5">
+                      <Shield className="w-3.5 h-3.5 text-slate-400" />
+                      <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">View Only</span>
+                    </div>
+                  )}
                 </td>
                 <td className="px-6 py-4 text-sm text-muted-foreground">
                   {user.created_date ? format(new Date(user.created_date), "MMM d, yyyy") : "—"}
@@ -225,6 +232,7 @@ export default function SettingsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="view_only">View Only</SelectItem>
                 </SelectContent>
               </Select>
             </div>

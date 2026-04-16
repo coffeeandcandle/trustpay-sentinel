@@ -149,9 +149,9 @@ export default function ChatPage() {
                     <div className={cn("w-2 h-2 rounded-full", status.dot)} />
                   </div>
                   <p className="text-xs text-muted-foreground truncate">{convo.last_message || convo.subject || "New conversation"}</p>
-                  <div className="flex items-center justify-between mt-1.5">
-                    <Badge variant="secondary" className={cn("text-[10px] py-0", status.color)}>{status.label}</Badge>
-                    {convo.updated_date && <span className="text-[10px] text-muted-foreground">{format(new Date(convo.updated_date), "h:mm a")}</span>}
+                  <div className="flex items-center justify-between mt-1.5 gap-2">
+                    <Badge variant="secondary" className={cn("text-[10px] py-0 shrink-0", status.color)}>{status.label}</Badge>
+                    {convo.updated_date && <span className="text-[10px] text-muted-foreground whitespace-nowrap">{format(new Date(convo.updated_date), "h:mm a")}</span>}
                   </div>
                 </button>
               );

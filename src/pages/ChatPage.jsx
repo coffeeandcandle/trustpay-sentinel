@@ -104,7 +104,7 @@ export default function ChatPage() {
   return (
     <div className="flex" style={{ height: "calc(100vh - 72px)" }}>
       {/* Conversations List */}
-      <div className="w-[340px] border-r border-border bg-card flex flex-col">
+      <div className="w-[320px] min-w-[320px] border-r border-border bg-card flex flex-col overflow-hidden">
         <div className="p-5 border-b border-border">
           <div className="flex items-center justify-between mb-1">
             <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -126,7 +126,7 @@ export default function ChatPage() {
           )}
         </div>
         <ScrollArea className="flex-1">
-          <div className="p-2 space-y-1">
+          <div className="p-2 space-y-1 overflow-hidden">
             {conversations.length === 0 ? (
               <div className="text-center py-12">
                 <MessageCircle className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
@@ -149,9 +149,9 @@ export default function ChatPage() {
                     <div className={cn("w-2 h-2 rounded-full", status.dot)} />
                   </div>
                   <p className="text-xs text-muted-foreground truncate">{convo.last_message || convo.subject || "New conversation"}</p>
-                  <div className="flex items-center justify-between mt-1.5 gap-2">
+                  <div className="flex items-center justify-between mt-1.5 gap-2 w-full">
                     <Badge variant="secondary" className={cn("text-[10px] py-0 shrink-0", status.color)}>{status.label}</Badge>
-                    {convo.updated_date && <span className="text-[10px] text-muted-foreground whitespace-nowrap">{format(new Date(convo.updated_date), "h:mm a")}</span>}
+                    {convo.updated_date && <span className="text-[10px] text-muted-foreground shrink-0">{format(new Date(convo.updated_date), "h:mm a")}</span>}
                   </div>
                 </button>
               );

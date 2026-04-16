@@ -17,6 +17,7 @@ const navItems = [
   { path: "/tickets", label: "Complaints", icon: Ticket },
   { path: "/notifications", label: "Notifications", icon: Bell },
   { path: "/chat", label: "Live Chat", icon: MessageCircle },
+  { path: "/audit-logs", label: "Audit Logs", icon: Shield },
 ];
 
 export default function Sidebar() {

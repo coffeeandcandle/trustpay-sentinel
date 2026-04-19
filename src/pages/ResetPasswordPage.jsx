@@ -63,7 +63,7 @@ export default function ResetPasswordPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setErrorMsg(data.message || data.error_description || 'Failed to update password.');
+        setErrorMsg(data.msg || data.message || data.error_description || 'Failed to update password.');
         setStatus('error');
       } else {
         setStatus('success');

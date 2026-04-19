@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, BarChart3, FileText, AlertTriangle,
@@ -21,8 +21,7 @@ const navItems = [
   { path: "/settings", label: "Settings", icon: Settings },
 ];
 
-export default function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false);
+export default function Sidebar({ collapsed, onToggle }) {
   const location = useLocation();
   const { logout } = useAuth();
 
@@ -76,11 +75,12 @@ export default function Sidebar() {
           {!collapsed && <span>Sign Out</span>}
         </button>
         <button
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={onToggle}
           className="flex items-center justify-center w-full py-2 rounded-lg text-sidebar-foreground/40 hover:text-sidebar-foreground/70 hover:bg-sidebar-accent transition-colors"
         >
           {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
         </button>
+
       </div>
     </aside>
   );

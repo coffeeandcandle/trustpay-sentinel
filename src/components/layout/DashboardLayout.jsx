@@ -6,7 +6,7 @@ export default function DashboardLayout() {
   return (
     <div className="min-h-screen bg-background">
       <Sidebar />
-      <main className="ml-[260px] min-h-screen transition-all duration-300">
+      <main className="ml-[260px] min-h-screen transition-all duration-300 bg-card">
         <Outlet />
       </main>
     </div>

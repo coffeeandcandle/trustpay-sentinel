@@ -32,14 +32,13 @@ export default function Sidebar({ collapsed, onToggle }) {
     )}>
       {/* Logo */}
       <div className="flex items-center gap-3 px-4 h-[72px] border-b border-sidebar-border overflow-hidden">
-        <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0">
-          <Shield className="w-5 h-5 text-primary" />
-        </div>
+        <img
+          src="/logo.png"
+          alt="Trustdepo"
+          className={cn("object-contain flex-shrink-0 transition-all duration-300", collapsed ? "h-7 w-7" : "h-8")}
+        />
         {!collapsed && (
-          <div className="flex flex-col leading-tight">
-            <span className="text-sidebar-foreground font-bold text-base tracking-tight">Trustdepo</span>
-            <span className="text-primary text-[10px] font-semibold tracking-widest uppercase">Admin</span>
-          </div>
+          <span className="text-primary text-[10px] font-semibold tracking-widest uppercase">Admin</span>
         )}
       </div>
 

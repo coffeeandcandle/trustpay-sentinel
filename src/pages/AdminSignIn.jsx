@@ -36,14 +36,9 @@ export default function AdminSignIn() {
           {/* Logo */}
           <div className="flex flex-col items-center mb-10">
             <img
-              src="https://media.base44.com/images/public/69e096635a9256978131bd05/608378266_Asset12x.png"
-              alt="Sando Pay Icon"
-              className="w-16 h-16 rounded-2xl object-contain mb-5"
-            />
-            <img
-              src="https://media.base44.com/images/public/69e096635a9256978131bd05/c6893f589_Asset22x.png"
-              alt="Sando Pay"
-              className="h-8 object-contain"
+              src="/logo.png"
+              alt="Trustdepo"
+              className="h-16 object-contain mb-4"
             />
             <p className="text-sm text-slate-400 mt-2">Admin Operations Portal</p>
           </div>

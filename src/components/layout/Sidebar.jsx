@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, Users, BarChart3, FileText, AlertTriangle,
-  Bell, MessageCircle, ChevronLeft, ChevronRight, Shield, LogOut, Zap, Ticket, Settings
+  Bell, MessageCircle, ChevronLeft, ChevronRight, Shield, LogOut, Zap, Ticket, Settings, ArrowUpCircle
 } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
 import { cn } from "@/lib/utils";
@@ -17,6 +17,7 @@ const navItems = [
   { path: "/tickets", label: "Complaints", icon: Ticket },
   { path: "/notifications", label: "Notifications", icon: Bell },
   { path: "/chat", label: "Live Chat", icon: MessageCircle },
+  { path: "/withdrawals", label: "Withdrawals", icon: ArrowUpCircle },
   { path: "/audit-logs", label: "Audit Logs", icon: Shield },
   { path: "/settings", label: "Settings", icon: Settings },
 ];

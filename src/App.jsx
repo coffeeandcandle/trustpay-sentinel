@@ -20,6 +20,7 @@ import TicketsPage from './pages/TicketsPage';
 import AdminSignIn from './pages/AdminSignIn';
 import AuditLogsPage from './pages/AuditLogsPage';
 import SettingsPage from './pages/SettingsPage';
+import WithdrawalsPage from './pages/WithdrawalsPage';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isAuthenticated, user } = useAuth();
@@ -63,6 +64,7 @@ const AuthenticatedApp = () => {
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/tickets" element={<TicketsPage />} />
         <Route path="/audit-logs" element={<AuditLogsPage />} />
+        <Route path="/withdrawals" element={<WithdrawalsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Route>
       <Route path="/admin-signin" element={<AdminSignIn />} />

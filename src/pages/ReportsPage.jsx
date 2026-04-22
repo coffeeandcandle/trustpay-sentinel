@@ -31,8 +31,8 @@ export default function ReportsPage() {
     mutationFn: (data) => adminApi.createReport({
       ...data,
       status: "ready",
-      total_transactions: Math.floor(Math.random() * 5000),
-      total_amount: Math.floor(Math.random() * 500000),
+      total_transactions: 0,
+      total_amount: 0,
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["reports"] });

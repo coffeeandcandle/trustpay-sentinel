@@ -69,7 +69,7 @@ export default function TransactionsPage() {
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="bg-card rounded-2xl border border-border/50 p-4">
           <p className="text-xs text-muted-foreground font-medium">Total Volume</p>
-          <p className="text-2xl font-bold text-foreground mt-1">AED {totalVolume.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+          <p className="text-2xl font-bold text-foreground mt-1">£{totalVolume.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
           <p className="text-xs text-muted-foreground mt-1">{filtered.length} transactions</p>
         </div>
         <div className="bg-card rounded-2xl border border-border/50 p-4">
@@ -158,8 +158,8 @@ export default function TransactionsPage() {
                       <td className="px-5 py-3.5 text-sm text-muted-foreground">{tx.sender_name || tx.sender_email || "—"}</td>
                       <td className="px-5 py-3.5 text-sm text-muted-foreground">{tx.recipient_name || tx.recipient_email || "—"}</td>
                       <td className="px-5 py-3.5">
-                        <span className="text-sm font-semibold text-foreground">AED {tx.amount?.toLocaleString()}</span>
-                        {tx.fee > 0 && <span className="text-xs text-muted-foreground ml-1">+AED {tx.fee} fee</span>}
+                        <span className="text-sm font-semibold text-foreground">£{tx.amount?.toLocaleString()}</span>
+                        {tx.fee > 0 && <span className="text-xs text-muted-foreground ml-1">+£{tx.fee} fee</span>}
                       </td>
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-1.5 text-sm text-muted-foreground capitalize">

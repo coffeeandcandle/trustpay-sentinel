@@ -12,18 +12,9 @@ import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 
 const CURRENCIES = [
-  { code: "AED", name: "UAE Dirham" },
+  { code: "GBP", name: "British Pound" },
   { code: "USD", name: "US Dollar" },
   { code: "EUR", name: "Euro" },
-  { code: "GBP", name: "British Pound" },
-  { code: "SAR", name: "Saudi Riyal" },
-  { code: "QAR", name: "Qatari Riyal" },
-  { code: "KWD", name: "Kuwaiti Dinar" },
-  { code: "BHD", name: "Bahraini Dinar" },
-  { code: "OMR", name: "Omani Rial" },
-  { code: "INR", name: "Indian Rupee" },
-  { code: "PKR", name: "Pakistani Rupee" },
-  { code: "EGP", name: "Egyptian Pound" },
 ];
 
 export default function SettingsPage() {
@@ -34,7 +25,7 @@ export default function SettingsPage() {
   const [editPwLoading] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteRole, setInviteRole] = useState("admin");
-  const [currency, setCurrency] = useState(() => localStorage.getItem("platform_currency") || "AED");
+  const [currency, setCurrency] = useState(() => localStorage.getItem("platform_currency") || "GBP");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPw, setShowNewPw] = useState(false);

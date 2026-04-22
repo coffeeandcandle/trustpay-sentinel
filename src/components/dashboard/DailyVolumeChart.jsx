@@ -7,7 +7,7 @@ const CustomTooltip = ({ active, payload, label }) => {
     return (
       <div className="bg-card border border-border rounded-xl p-3 shadow-xl">
         <p className="text-xs font-semibold text-foreground mb-1">{label}</p>
-        <p className="text-xs text-primary">Volume: AED {payload[0]?.value?.toLocaleString()}</p>
+        <p className="text-xs text-primary">Volume: £{payload[0]?.value?.toLocaleString()}</p>
         <p className="text-xs text-chart-2">Count: {payload[1]?.value}</p>
       </div>
     );
@@ -35,7 +35,7 @@ export default function DailyVolumeChart({ transactions }) {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-lg font-semibold text-foreground">Daily Transaction Volume</h3>
-          <p className="text-sm text-muted-foreground mt-0.5">Last 14 days — AED volume & count</p>
+          <p className="text-sm text-muted-foreground mt-0.5">Last 14 days — GBP volume & count</p>
         </div>
         <div className="flex gap-4">
           <div className="flex items-center gap-2">

@@ -125,7 +125,7 @@ export default function DisputesPage() {
                   </td>
                   <td className="px-6 py-4 text-sm font-mono text-foreground">{d.transaction_id}</td>
                   <td className="px-6 py-4 text-sm text-muted-foreground">{d.user_email}</td>
-                  <td className="px-6 py-4 text-sm font-semibold text-foreground">AED {d.amount?.toLocaleString()}</td>
+                  <td className="px-6 py-4 text-sm font-semibold text-foreground">£{d.amount?.toLocaleString()}</td>
                   <td className="px-6 py-4"><Badge variant="secondary" className="capitalize text-xs">{d.reason?.replace(/_/g, " ")}</Badge></td>
                   <td className="px-6 py-4"><span className={cn("text-xs font-medium px-2 py-0.5 rounded-full capitalize", priorityStyles[d.priority])}>{d.priority}</span></td>
                   <td className="px-6 py-4"><span className={cn("text-xs font-medium px-2.5 py-1 rounded-full border", status.color)}>{status.label}</span></td>
@@ -157,7 +157,7 @@ export default function DisputesPage() {
               )}
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div><span className="text-muted-foreground">Transaction</span><p className="font-mono font-medium mt-0.5">{selected.transaction_id}</p></div>
-                <div><span className="text-muted-foreground">Amount</span><p className="font-semibold mt-0.5">AED {selected.amount?.toLocaleString()}</p></div>
+                <div><span className="text-muted-foreground">Amount</span><p className="font-semibold mt-0.5">£{selected.amount?.toLocaleString()}</p></div>
                 <div><span className="text-muted-foreground">User</span><p className="mt-0.5">{selected.user_email}</p></div>
                 <div><span className="text-muted-foreground">Reason</span><p className="capitalize mt-0.5">{selected.reason?.replace(/_/g, " ")}</p></div>
               </div>

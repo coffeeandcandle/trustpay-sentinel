@@ -2,7 +2,6 @@ import React from "react";
 import adminApi from "@/api/apiClient";
 import { useQuery } from "@tanstack/react-query";
 import StatCard from "@/components/dashboard/StatCard";
-import RevenueChart from "@/components/dashboard/RevenueChart";
 import RecentActivity from "@/components/dashboard/RecentActivity";
 import DailyVolumeChart from "@/components/dashboard/DailyVolumeChart";
 import SuccessFailureChart from "@/components/dashboard/SuccessFailureChart";
@@ -45,7 +44,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <StatCard
           title="Total Volume"
-          value={`AED ${totalVolume.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+          value={`£${totalVolume.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
           icon={Zap}
           iconBg="bg-primary/10"
         />

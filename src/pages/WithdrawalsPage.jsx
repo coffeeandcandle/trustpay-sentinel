@@ -56,7 +56,7 @@ export default function WithdrawalsPage() {
   });
 
   const handleApprove = (wr) => {
-    if (!window.confirm(`Approve withdrawal of AED ${formatAmount(wr.amount)} for ${wr.user?.email}?\n\nStripe will automatically transfer funds to their connected bank account.`)) return;
+    if (!window.confirm(`Approve withdrawal of £${formatAmount(wr.amount)} for ${wr.user?.email}?\n\nStripe will automatically transfer funds to their connected bank account.`)) return;
     approveMutation.mutate(wr.id);
   };
 
@@ -119,7 +119,7 @@ export default function WithdrawalsPage() {
                       <DollarSign className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                      <p className="text-xl font-bold text-foreground">AED {formatAmount(wr.amount)}</p>
+                      <p className="text-xl font-bold text-foreground">£{formatAmount(wr.amount)}</p>
                       <p className="text-xs text-muted-foreground">{formatDate(wr.created_at)}</p>
                     </div>
                     {statusBadge(wr.status)}

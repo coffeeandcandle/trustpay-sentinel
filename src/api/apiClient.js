@@ -50,6 +50,9 @@ export const adminApi = {
   updateUserStatus: (id, data) => api.put(`/api/admin/users/${id}/status`, data),
   // Transactions
   getTransactions: () => api.get('/api/admin/transactions'),
+  cancelTransaction: (id) => api.post(`/api/admin/transactions/${id}/cancel`, {}),
+  pauseTransaction: (id) => api.post(`/api/admin/transactions/${id}/pause`, {}),
+  resumeTransaction: (id) => api.post(`/api/admin/transactions/${id}/resume`, {}),
   // Disputes
   getDisputes: () => api.get('/api/admin/disputes'),
   updateDispute: (id, data) => api.put(`/api/admin/disputes/${id}`, data),

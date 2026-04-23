@@ -1,9 +1,10 @@
 import React, { useState, useRef } from "react";
 import adminApi from "@/api/apiClient";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, ArrowUpRight, ArrowDownLeft, RefreshCw, Zap, AlertOctagon } from "lucide-react";
+import { Search, ArrowUpRight, ArrowDownLeft, RefreshCw, Zap, AlertOctagon, XCircle, PauseCircle, PlayCircle } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,6 +15,7 @@ const statusStyles = {
   released:   { label: "Released",   cls: "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" },
   cancelled:  { label: "Cancelled",  cls: "bg-red-500/10 text-red-500 border-red-500/20" },
   disputed:   { label: "Disputed",   cls: "bg-orange-500/10 text-orange-600 border-orange-500/20" },
+  paused:     { label: "Paused",     cls: "bg-slate-500/10 text-slate-500 border-slate-500/20" },
 };
 
 const typeIcons = {
@@ -27,6 +29,7 @@ export default function TransactionsPage() {
   const [search, setSearch]       = useState("");
   const [statusFilter, setStatus] = useState("all");
   const [typeFilter, setType]     = useState("all");
+  const queryClient = useQueryClient();
 
   const { data: transactions, isLoading } = useQuery({
     queryKey: ["transactions"],
@@ -34,6 +37,34 @@ export default function TransactionsPage() {
     initialData: [],
     refetchInterval: 5000,
   });
+
+  const cancelMutation = useMutation({
+    mutationFn: (id) => adminApi.cancelTransaction(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["transactions"] }),
+    onError: (e) => alert(e.message),
+  });
+
+  const pauseMutation = useMutation({
+    mutationFn: (id) => adminApi.pauseTransaction(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["transactions"] }),
+    onError: (e) => alert(e.message),
+  });
+
+  const resumeMutation = useMutation({
+    mutationFn: (id) => adminApi.resumeTransaction(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["transactions"] }),
+    onError: (e) => alert(e.message),
+  });
+
+  const handleCancel = (tx) => {
+    if (!window.confirm(`Cancel transaction "${tx.title}" (£${tx.amount})?\n\nFunds will be refunded to the buyer's card.`)) return;
+    cancelMutation.mutate(tx.id);
+  };
+
+  const handlePause = (tx) => {
+    if (!window.confirm(`Pause transaction "${tx.title}"?\n\nBoth parties will be unable to confirm until resumed.`)) return;
+    pauseMutation.mutate(tx.id);
+  };
 
   const filtered = transactions.filter(t => {
     const matchSearch  = !search ||
@@ -99,6 +130,7 @@ export default function TransactionsPage() {
             <SelectItem value="released">Released</SelectItem>
             <SelectItem value="cancelled">Cancelled</SelectItem>
             <SelectItem value="disputed">Disputed</SelectItem>
+            <SelectItem value="paused">Paused</SelectItem>
           </SelectContent>
         </Select>
         <Select value={typeFilter} onValueChange={setType}>
@@ -174,9 +206,45 @@ export default function TransactionsPage() {
                          tx.created_date ? format(new Date(tx.created_date), "MMM d, HH:mm:ss") : "—"}
                       </td>
                       <td className="px-5 py-3.5">
-                        {(tx.flagged || tx.status === "disputed") && (
-                          <AlertOctagon className="w-4 h-4 text-orange-500" />
-                        )}
+                        <div className="flex items-center gap-1.5">
+                          {(tx.flagged || tx.status === "disputed") && (
+                            <AlertOctagon className="w-4 h-4 text-orange-500" />
+                          )}
+                          {!["released", "cancelled"].includes(tx.status) && (
+                            <>
+                              {tx.status === "paused" ? (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-7 px-2 text-xs gap-1 text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/10"
+                                  onClick={() => resumeMutation.mutate(tx.id)}
+                                  disabled={resumeMutation.isPending}
+                                >
+                                  <PlayCircle className="w-3.5 h-3.5" /> Resume
+                                </Button>
+                              ) : (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="h-7 px-2 text-xs gap-1 text-slate-500 border-slate-500/30 hover:bg-slate-500/10"
+                                  onClick={() => handlePause(tx)}
+                                  disabled={pauseMutation.isPending}
+                                >
+                                  <PauseCircle className="w-3.5 h-3.5" /> Pause
+                                </Button>
+                              )}
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-7 px-2 text-xs gap-1 text-red-500 border-red-500/30 hover:bg-red-500/10"
+                                onClick={() => handleCancel(tx)}
+                                disabled={cancelMutation.isPending}
+                              >
+                                <XCircle className="w-3.5 h-3.5" /> Cancel
+                              </Button>
+                            </>
+                          )}
+                        </div>
                       </td>
                     </motion.tr>
                   );

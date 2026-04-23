@@ -137,7 +137,7 @@ export default function TransactionsPage() {
           <SelectTrigger className="w-[140px]"><SelectValue placeholder="All Types" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Types</SelectItem>
-            <SelectItem value="escrow">Escrow</SelectItem>
+            <SelectItem value="escrow">Secure</SelectItem>
             <SelectItem value="withdrawal">Withdrawal</SelectItem>
             <SelectItem value="refund">Refund</SelectItem>
             <SelectItem value="fee">Fee</SelectItem>

@@ -3,7 +3,7 @@ import adminApi from "@/api/apiClient";
 import { useQuery } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Users, Mail, Calendar } from "lucide-react";
+import { Search, Users, Mail, Calendar, Crown, Shield, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import UserActionDialog from "@/components/users/UserActionDialog";
 import { Button } from "@/components/ui/button";
@@ -75,6 +75,7 @@ export default function UsersPage() {
             <SelectContent>
               <SelectItem value="all">All Roles</SelectItem>
               <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="view_only">View Only</SelectItem>
               <SelectItem value="user">User</SelectItem>
             </SelectContent>
           </Select>
@@ -96,6 +97,7 @@ export default function UsersPage() {
             <tr className="border-b border-border">
               <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-6 py-4">User</th>
               <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-6 py-4">Email</th>
+              <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-6 py-4">Role</th>
               <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-6 py-4">KYC Status</th>
               <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-6 py-4">Account</th>
               <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-6 py-4">Plan</th>
@@ -110,6 +112,7 @@ export default function UsersPage() {
                   <td className="px-6 py-4"><div className="h-4 w-32 bg-muted rounded" /></td>
                   <td className="px-6 py-4"><div className="h-4 w-48 bg-muted rounded" /></td>
                   <td className="px-6 py-4"><div className="h-5 w-16 bg-muted rounded-full" /></td>
+                  <td className="px-6 py-4"><div className="h-5 w-16 bg-muted rounded-full" /></td>
                   <td className="px-6 py-4"><div className="h-4 w-24 bg-muted rounded" /></td>
                   <td className="px-6 py-4"><div className="h-4 w-16 bg-muted rounded" /></td>
                   <td className="px-6 py-4"><div className="h-4 w-24 bg-muted rounded" /></td>
@@ -118,7 +121,7 @@ export default function UsersPage() {
               ))
             ) : filtered.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-6 py-12 text-center">
+                <td colSpan={8} className="px-6 py-12 text-center">
                   <Users className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
                   <p className="text-sm text-muted-foreground">No users found</p>
                 </td>
@@ -140,6 +143,21 @@ export default function UsersPage() {
                     <Mail className="w-3.5 h-3.5" />
                     {user.email}
                   </div>
+                </td>
+                <td className="px-6 py-4">
+                  {user.role === 'admin' ? (
+                    <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600">
+                      <Crown className="w-3 h-3" /> Admin
+                    </span>
+                  ) : user.role === 'view_only' ? (
+                    <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-slate-500/10 text-slate-500">
+                      <Shield className="w-3 h-3" /> View Only
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                      <User className="w-3 h-3" /> User
+                    </span>
+                  )}
                 </td>
                 <td className="px-6 py-4">
                   {(() => {

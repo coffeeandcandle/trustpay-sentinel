@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Routes, useLocation } from 'react-route
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import AcceptInvitePage from './pages/AcceptInvitePage';
 
 import DashboardLayout from './components/layout/DashboardLayout';
 import Dashboard from './pages/Dashboard';
@@ -28,6 +29,10 @@ const AuthenticatedApp = () => {
 
   if (location.pathname === '/reset-password') {
     return <ResetPasswordPage />;
+  }
+
+  if (location.pathname === '/accept-invite') {
+    return <AcceptInvitePage />;
   }
 
   if (isLoadingAuth) {

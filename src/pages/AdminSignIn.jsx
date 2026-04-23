@@ -96,7 +96,7 @@ export default function AdminSignIn() {
         </div>
 
         <p className="text-center text-xs text-slate-600 mt-6">
-          © {new Date().getFullYear()} Sando Pay. All rights reserved.
+          © {new Date().getFullYear()} TrustDepo. All rights reserved.
         </p>
       </div>
     </div>

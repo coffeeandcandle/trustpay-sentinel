@@ -6,15 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { MessageCircle, Send, User, Headphones, CheckCircle2, Plus, X } from "lucide-react";
+import { MessageCircle, Send, User, Headphones, CheckCircle2, Plus, X, ArrowLeft } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
 const statusConfig = {
-  waiting:  { label: "Waiting",  color: "bg-amber-500/10 text-amber-600",      dot: "bg-amber-500" },
-  active:   { label: "Active",   color: "bg-emerald-500/10 text-emerald-600",  dot: "bg-emerald-500" },
-  resolved: { label: "Resolved", color: "bg-muted text-muted-foreground",       dot: "bg-muted-foreground" },
-  closed:   { label: "Closed",   color: "bg-muted text-muted-foreground",       dot: "bg-muted-foreground" },
+  waiting:  { label: "Waiting",  color: "bg-amber-500/10 text-amber-600",     dot: "bg-amber-500" },
+  active:   { label: "Active",   color: "bg-emerald-500/10 text-emerald-600", dot: "bg-emerald-500" },
+  resolved: { label: "Resolved", color: "bg-muted text-muted-foreground",      dot: "bg-muted-foreground" },
+  closed:   { label: "Closed",   color: "bg-muted text-muted-foreground",      dot: "bg-muted-foreground" },
 };
 
 export default function ChatPage() {
@@ -70,14 +70,13 @@ export default function ChatPage() {
 
   const newConvoMutation = useMutation({
     mutationFn: async () => {
-      const convo = await adminApi.createConversation({
+      return await adminApi.createConversation({
         user_email: newEmail.trim(),
         user_name: newEmail.trim().split("@")[0],
         subject: newSubject.trim() || "Admin initiated chat",
         status: "active",
         assigned_to: adminUser?.email,
       });
-      return convo;
     },
     onSuccess: (convo) => {
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
@@ -93,32 +92,52 @@ export default function ChatPage() {
     sendMutation.mutate(messageText.trim());
   };
 
+  const handleSelectConvo = (convo) => {
+    setSelectedConvo(convo);
+    setShowNewForm(false);
+  };
+
+  const handleBack = () => setSelectedConvo(null);
+
   return (
-    <div className="flex" style={{ height: "calc(100vh - 64px)" }}>
-      {/* Conversations List */}
-      <div className="w-[400px] min-w-[400px] border-r border-border bg-card flex flex-col overflow-hidden">
-        <div className="p-5 border-b border-border">
+    <div className="flex h-[calc(100dvh-56px)] md:h-screen overflow-hidden">
+
+      {/* ── Conversations List ─────────────────────────────── */}
+      <div className={cn(
+        "border-r border-border bg-card flex flex-col overflow-hidden",
+        "w-full md:w-[340px] md:min-w-[340px]",
+        // Mobile: hide list when a conversation is open
+        selectedConvo ? "hidden md:flex" : "flex"
+      )}>
+        <div className="p-4 border-b border-border">
           <div className="flex items-center justify-between mb-1">
-            <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
               <Headphones className="w-5 h-5 text-primary" /> Live Chat
             </h2>
             <Button size="icon" variant="ghost" className="w-7 h-7" onClick={() => setShowNewForm(v => !v)}>
               {showNewForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             </Button>
           </div>
-          <p className="text-xs text-muted-foreground">{conversations.filter(c => c.status === "waiting" || c.status === "active").length} active conversations</p>
+          <p className="text-xs text-muted-foreground">
+            {conversations.filter(c => c.status === "waiting" || c.status === "active").length} active conversations
+          </p>
           {showNewForm && (
             <div className="mt-3 space-y-2">
               <Input placeholder="User email..." value={newEmail} onChange={e => setNewEmail(e.target.value)} className="text-xs h-8" />
               <Input placeholder="Subject (optional)..." value={newSubject} onChange={e => setNewSubject(e.target.value)} className="text-xs h-8" />
-              <Button size="sm" className="w-full text-xs h-8" disabled={!newEmail.trim() || newConvoMutation.isPending} onClick={() => newConvoMutation.mutate()}>
+              <Button
+                size="sm" className="w-full text-xs h-8"
+                disabled={!newEmail.trim() || newConvoMutation.isPending}
+                onClick={() => newConvoMutation.mutate()}
+              >
                 Start Conversation
               </Button>
             </div>
           )}
         </div>
+
         <ScrollArea className="flex-1">
-          <div className="p-2 space-y-1 overflow-hidden">
+          <div className="p-2 space-y-1">
             {conversations.length === 0 ? (
               <div className="text-center py-12">
                 <MessageCircle className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
@@ -130,7 +149,7 @@ export default function ChatPage() {
               return (
                 <button
                   key={convo.id}
-                  onClick={() => setSelectedConvo(convo)}
+                  onClick={() => handleSelectConvo(convo)}
                   className={cn(
                     "w-full text-left p-3 rounded-xl transition-all",
                     isSelected ? "bg-primary/10 border border-primary/20" : "hover:bg-muted/50 border border-transparent"
@@ -138,12 +157,16 @@ export default function ChatPage() {
                 >
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm font-medium text-foreground truncate">{convo.user_name || convo.user_email}</span>
-                    <div className={cn("w-2 h-2 rounded-full", status.dot)} />
+                    <div className={cn("w-2 h-2 rounded-full flex-shrink-0", status.dot)} />
                   </div>
                   <p className="text-xs text-muted-foreground truncate">{convo.last_message || convo.subject || "New conversation"}</p>
-                  <div className="flex items-center justify-between mt-1.5 gap-2 w-full">
+                  <div className="flex items-center justify-between mt-1.5 gap-2">
                     <Badge variant="secondary" className={cn("text-[10px] py-0 shrink-0", status.color)}>{status.label}</Badge>
-                    {convo.updated_date && <span className="text-[10px] text-muted-foreground shrink-0">{format(new Date(convo.updated_date), "h:mm a")}</span>}
+                    {convo.updated_date && (
+                      <span className="text-[10px] text-muted-foreground shrink-0">
+                        {format(new Date(convo.updated_date), "h:mm a")}
+                      </span>
+                    )}
                   </div>
                 </button>
               );
@@ -152,35 +175,55 @@ export default function ChatPage() {
         </ScrollArea>
       </div>
 
-      {/* Chat Area */}
-      <div className="flex-1 flex flex-col bg-background">
+      {/* ── Chat Area ──────────────────────────────────────── */}
+      <div className={cn(
+        "flex-1 flex-col bg-background overflow-hidden",
+        // Mobile: only show when a convo is selected
+        selectedConvo ? "flex" : "hidden md:flex"
+      )}>
         {selectedConvo ? (
           <>
             {/* Chat Header */}
-            <div className="px-6 py-4 border-b border-border bg-card flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
+            <div className="px-4 py-3 border-b border-border bg-card flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                {/* Back button — mobile only */}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="md:hidden w-8 h-8 flex-shrink-0"
+                  onClick={handleBack}
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                </Button>
+                <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                   <User className="w-4 h-4 text-primary" />
                 </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-foreground">{selectedConvo.user_name || selectedConvo.user_email}</h3>
-                  <p className="text-xs text-muted-foreground">{selectedConvo.subject || "Support conversation"}</p>
+                <div className="min-w-0">
+                  <h3 className="text-sm font-semibold text-foreground truncate">
+                    {selectedConvo.user_name || selectedConvo.user_email}
+                  </h3>
+                  <p className="text-xs text-muted-foreground truncate">{selectedConvo.subject || "Support conversation"}</p>
                 </div>
               </div>
               {(selectedConvo.status === "active" || selectedConvo.status === "waiting") && (
-                <Button variant="outline" size="sm" onClick={() => resolveMutation.mutate(selectedConvo.id)} className="gap-1.5 text-xs">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Resolve
+                <Button
+                  variant="outline" size="sm"
+                  onClick={() => resolveMutation.mutate(selectedConvo.id)}
+                  className="gap-1.5 text-xs flex-shrink-0"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Resolve</span>
                 </Button>
               )}
             </div>
 
             {/* Messages */}
-            <ScrollArea className="flex-1 p-6">
+            <ScrollArea className="flex-1 p-4">
               <div className="space-y-4 max-w-3xl mx-auto">
                 {messages.map(msg => (
                   <div key={msg.id} className={cn("flex", msg.sender_type === "admin" ? "justify-end" : "justify-start")}>
                     <div className={cn(
-                      "max-w-[75%] rounded-2xl px-4 py-3",
+                      "max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-3",
                       msg.sender_type === "admin"
                         ? "bg-primary text-primary-foreground rounded-br-md"
                         : "bg-card border border-border rounded-bl-md"
@@ -200,8 +243,8 @@ export default function ChatPage() {
             </ScrollArea>
 
             {/* Input */}
-            <div className="p-4 border-t border-border bg-card">
-              <div className="flex gap-3 max-w-3xl mx-auto">
+            <div className="p-3 border-t border-border bg-card">
+              <div className="flex gap-2 max-w-3xl mx-auto">
                 <Input
                   placeholder="Type a message..."
                   value={messageText}

@@ -120,7 +120,8 @@ export default function SettingsPage() {
           <h2 className="text-sm font-semibold text-foreground">Admin Users</h2>
           <Badge variant="secondary" className="ml-auto text-xs">{users.length} admins</Badge>
         </div>
-        <table className="w-full">
+        <div className="overflow-x-auto">
+        <table className="w-full min-w-[640px]">
           <thead>
             <tr className="border-b border-border">
               <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-6 py-3">User</th>
@@ -230,6 +231,7 @@ export default function SettingsPage() {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
 
       {/* Currency Settings Section */}

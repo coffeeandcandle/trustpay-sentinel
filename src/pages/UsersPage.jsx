@@ -51,7 +51,7 @@ export default function UsersPage() {
   });
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Users</h1>
@@ -91,7 +91,7 @@ export default function UsersPage() {
         </div>
       </div>
 
-      <div className="bg-card rounded-2xl border border-border/50 overflow-hidden">
+      <div className="bg-card rounded-2xl border border-border/50 overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="border-b border-border">

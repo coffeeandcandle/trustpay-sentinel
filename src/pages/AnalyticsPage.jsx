@@ -24,7 +24,7 @@ const COLORS = ["hsl(217, 91%, 60%)", "hsl(160, 60%, 45%)", "hsl(43, 74%, 66%)",
 
 export default function AnalyticsPage() {
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-foreground">Analytics</h1>
         <p className="text-sm text-muted-foreground mt-1">Platform performance metrics and insights</p>

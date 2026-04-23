@@ -73,7 +73,7 @@ export default function TicketsPage() {
   const inProgressCount = tickets.filter(t => t.status === "in_progress").length;
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Complaints & Tickets</h1>
@@ -128,7 +128,7 @@ export default function TicketsPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-card rounded-2xl border border-border/50 overflow-hidden">
+      <div className="bg-card rounded-2xl border border-border/50 overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="border-b border-border">

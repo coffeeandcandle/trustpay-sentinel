@@ -81,7 +81,7 @@ export default function TransactionsPage() {
   const pendingCount = filtered.filter(t => t.status === "pending" || t.status === "sender_ok").length;
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -146,7 +146,7 @@ export default function TransactionsPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-card rounded-2xl border border-border/50 overflow-hidden">
+      <div className="bg-card rounded-2xl border border-border/50 overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="border-b border-border">

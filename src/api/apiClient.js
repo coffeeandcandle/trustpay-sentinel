@@ -77,6 +77,7 @@ export const adminApi = {
   getAdmins: () => api.get('/api/admin/admins'),
   inviteAdmin: (data) => api.post('/api/admin/admins/invite', data),
   updateAdminRole: (id, data) => api.put(`/api/admin/admins/${id}/role`, data),
+  toggleAdminStatus: (id, is_disabled) => request('PATCH', `/api/admin/admins/${id}/status`, { is_disabled }),
 };
 
 export default adminApi;

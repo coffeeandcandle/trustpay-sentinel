@@ -46,8 +46,11 @@ const AuthenticatedApp = () => {
     );
   }
 
-  // Block non-admin / non-view_only users
-  if (user && user.role !== 'admin' && user.role !== 'view_only') {
+  // Block non-admin / non-view_only users, and disabled admins
+  if (user && (user.role !== 'admin' && user.role !== 'view_only')) {
+    return <AccessDeniedPage />;
+  }
+  if (user && user.is_disabled) {
     return <AccessDeniedPage />;
   }
 

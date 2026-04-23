@@ -72,10 +72,15 @@ export default function SettingsPage() {
     },
   });
 
-  const removeAdminMutation = useMutation({
-    mutationFn: (userId) => adminApi.updateAdminRole(userId, { role: "user" }),
-    onSuccess: () => {
-      toast({ title: "Admin removed", description: "User role has been changed to regular user." });
+  const toggleStatusMutation = useMutation({
+    mutationFn: ({ userId, is_disabled }) => adminApi.toggleAdminStatus(userId, is_disabled),
+    onSuccess: (data) => {
+      toast({
+        title: data.is_disabled ? "Admin disabled" : "Admin enabled",
+        description: data.is_disabled
+          ? "The admin account has been disabled and can no longer sign in."
+          : "The admin account has been re-enabled.",
+      });
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
     },
     onError: (err) => {
@@ -145,13 +150,16 @@ export default function SettingsPage() {
               <tr key={user.id} className="border-b border-border/50 hover:bg-muted/30 transition-colors">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center">
-                      <span className="text-sm font-semibold text-primary">
+                    <div className={cn("w-9 h-9 rounded-full flex items-center justify-center", user.is_disabled ? "bg-muted" : "bg-primary/10")}>
+                      <span className={cn("text-sm font-semibold", user.is_disabled ? "text-muted-foreground" : "text-primary")}>
                         {user.full_name?.[0]?.toUpperCase() || "?"}
                       </span>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-foreground">{user.full_name || "—"}</p>
+                      <p className={cn("text-sm font-medium", user.is_disabled ? "text-muted-foreground line-through" : "text-foreground")}>{user.full_name || "—"}</p>
+                      {user.is_disabled && (
+                        <span className="text-[10px] font-medium text-red-500 bg-red-500/10 px-1.5 py-0.5 rounded-full">Disabled</span>
+                      )}
                     </div>
                   </div>
                 </td>
@@ -204,11 +212,17 @@ export default function SettingsPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-red-500 hover:text-red-600 hover:bg-red-500/10 gap-1.5 text-xs"
-                      onClick={() => removeAdminMutation.mutate(user.id)}
-                      disabled={removeAdminMutation.isPending}
+                      className={cn(
+                        "gap-1.5 text-xs",
+                        user.is_disabled
+                          ? "text-emerald-600 hover:text-emerald-700 hover:bg-emerald-500/10"
+                          : "text-red-500 hover:text-red-600 hover:bg-red-500/10"
+                      )}
+                      onClick={() => toggleStatusMutation.mutate({ userId: user.id, is_disabled: !user.is_disabled })}
+                      disabled={toggleStatusMutation.isPending}
                     >
-                      <Trash2 className="w-3.5 h-3.5" /> Remove
+                      <Trash2 className="w-3.5 h-3.5" />
+                      {user.is_disabled ? "Enable" : "Disable"}
                     </Button>
                   </div>
                 </td>

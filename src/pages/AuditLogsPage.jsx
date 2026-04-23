@@ -80,7 +80,7 @@ export default function AuditLogsPage() {
   return (
     <div className="p-4 md:p-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <ShieldCheck className="w-6 h-6 text-primary" />
@@ -88,11 +88,9 @@ export default function AuditLogsPage() {
           </div>
           <p className="text-sm text-muted-foreground">Track all user &amp; admin activity for security and compliance</p>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-full font-medium">
-            {filtered.length} records
-          </span>
-        </div>
+        <span className="text-xs text-muted-foreground bg-muted px-3 py-1.5 rounded-full font-medium self-start sm:self-auto">
+          {filtered.length} records
+        </span>
       </div>
 
       {/* Filters */}

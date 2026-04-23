@@ -74,14 +74,14 @@ export default function TicketsPage() {
 
   return (
     <div className="p-4 md:p-8">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Complaints & Tickets</h1>
           <p className="text-sm text-muted-foreground mt-1">Review and resolve user complaints</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap gap-2">
           <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-            <SelectTrigger className="w-[130px]"><SelectValue placeholder="Priority" /></SelectTrigger>
+            <SelectTrigger className="w-full sm:w-[130px]"><SelectValue placeholder="Priority" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Priority</SelectItem>
               <SelectItem value="urgent">Urgent</SelectItem>
@@ -91,7 +91,7 @@ export default function TicketsPage() {
             </SelectContent>
           </Select>
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[150px]"><SelectValue placeholder="All Status" /></SelectTrigger>
+            <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="All Status" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="open">Open</SelectItem>
@@ -101,15 +101,15 @@ export default function TicketsPage() {
               <SelectItem value="closed">Closed</SelectItem>
             </SelectContent>
           </Select>
-          <div className="relative">
+          <div className="relative flex-1 min-w-[200px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input placeholder="Search tickets..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 w-[240px]" />
+            <Input placeholder="Search tickets..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 w-full" />
           </div>
         </div>
       </div>
 
       {/* Summary */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-card rounded-2xl border border-border/50 p-4">
           <p className="text-xs text-muted-foreground font-medium">Open Tickets</p>
           <p className="text-2xl font-bold text-amber-600 mt-1">{openCount}</p>

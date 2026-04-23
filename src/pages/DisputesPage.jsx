@@ -59,14 +59,14 @@ export default function DisputesPage() {
 
   return (
     <div className="p-4 md:p-8">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Disputes</h1>
           <p className="text-sm text-muted-foreground mt-1">Manage and resolve payment disputes</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap gap-2">
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[150px]"><SelectValue placeholder="All Status" /></SelectTrigger>
+            <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="All Status" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="open">Open</SelectItem>
@@ -76,9 +76,9 @@ export default function DisputesPage() {
               <SelectItem value="rejected">Rejected</SelectItem>
             </SelectContent>
           </Select>
-          <div className="relative">
+          <div className="relative flex-1 min-w-[200px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input placeholder="Search disputes..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 w-[260px]" />
+            <Input placeholder="Search disputes..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 w-full" />
           </div>
         </div>
       </div>

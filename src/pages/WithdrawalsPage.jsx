@@ -66,9 +66,9 @@ export default function WithdrawalsPage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 md:p-8 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Withdrawal Requests</h1>
           <p className="text-muted-foreground text-sm mt-1">Approve to auto-transfer via Stripe to seller's bank</p>
@@ -110,7 +110,7 @@ export default function WithdrawalsPage() {
         <div className="space-y-4">
           {withdrawals.map((wr) => (
             <div key={wr.id} className="bg-card border border-border rounded-xl p-5">
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                 {/* Left info */}
                 <div className="flex-1 space-y-3">
                   {/* Amount + status */}

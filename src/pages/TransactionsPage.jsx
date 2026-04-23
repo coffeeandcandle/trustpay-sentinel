@@ -97,7 +97,7 @@ export default function TransactionsPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-card rounded-2xl border border-border/50 p-4">
           <p className="text-xs text-muted-foreground font-medium">Total Volume</p>
           <p className="text-2xl font-bold text-foreground mt-1">£{totalVolume.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
@@ -116,13 +116,13 @@ export default function TransactionsPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-3 mb-5">
-        <div className="relative flex-1 max-w-sm">
+      <div className="flex flex-wrap gap-2 mb-5">
+        <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Search by ID, sender, recipient..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
+          <Input placeholder="Search by ID, sender, recipient..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9 w-full" />
         </div>
         <Select value={statusFilter} onValueChange={setStatus}>
-          <SelectTrigger className="w-[150px]"><SelectValue placeholder="All Status" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="All Status" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="pending">Pending</SelectItem>
@@ -134,7 +134,7 @@ export default function TransactionsPage() {
           </SelectContent>
         </Select>
         <Select value={typeFilter} onValueChange={setType}>
-          <SelectTrigger className="w-[140px]"><SelectValue placeholder="All Types" /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-[140px]"><SelectValue placeholder="All Types" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Types</SelectItem>
             <SelectItem value="escrow">Secure</SelectItem>

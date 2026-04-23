@@ -15,7 +15,7 @@ export default function AccessDeniedPage() {
           </div>
           <h1 className="text-xl font-bold text-sidebar-foreground">Access Denied</h1>
           <p className="text-sm text-sidebar-foreground/50 mt-2 leading-relaxed">
-            Your account does not have permission to access the TrustPay Admin Portal.
+            Your account does not have permission to access the TrustDepo Admin Portal.
             Please contact your IT administrator if you believe this is an error.
           </p>
           <Button

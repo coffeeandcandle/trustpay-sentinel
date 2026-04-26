@@ -1,4 +1,4 @@
-const BASE_URL = 'https://api.trustdepo.com';
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://api.trustdepo.com';
 const TOKEN_KEY = 'trustpay_access_token';
 
 export const getToken = () => {
